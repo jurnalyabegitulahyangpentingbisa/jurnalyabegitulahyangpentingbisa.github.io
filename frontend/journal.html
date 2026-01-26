@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jurnal Mengajar - Jurnal Mengajar & Absensi Siswa</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">Jurnal Mengajar & Absensi</div>
+    <ul class="navbar-menu">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="journal.html">Jurnal Mengajar</a></li>
+      <li><a href="attendance.html">Absensi</a></li>
+      <li><a href="settings.html">Pengaturan</a></li>
+    </ul>
+    <div class="user-menu">
+      <span id="userDisplay"></span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Page Title -->
+    <div class="card">
+      <div class="card-header flex-between">
+        <h2>Jurnal Mengajar</h2>
+        <button class="btn btn-primary" onclick="showAddJournalModal()">+ Tambah Jurnal</button>
+      </div>
+    </div>
+
+    <!-- Filter & Search -->
+    <div class="card">
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="filterClass">Kelas</label>
+            <select id="filterClass" onchange="applyFilters()">
+              <option value="">Semua Kelas</option>
+              <option value="10">Kelas X</option>
+              <option value="11">Kelas XI</option>
+              <option value="12">Kelas XII</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="filterDate">Tanggal</label>
+            <input type="date" id="filterDate" onchange="applyFilters()">
+          </div>
+          <div class="form-group">
+            <label for="filterStatus">Status</label>
+            <select id="filterStatus" onchange="applyFilters()">
+              <option value="">Semua Status</option>
+              <option value="pending">Pending</option>
+              <option value="verified">Terverifikasi</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Journal List -->
+    <div class="card">
+      <div class="card-body">
+        <div style="overflow-x: auto;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Tanggal</th>
+                <th>Kelas</th>
+                <th>Kompetensi Dasar</th>
+                <th>Metode Pembelajaran</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="journalTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 20px;">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex-center gap-10 mt-20">
+          <button class="btn btn-secondary btn-small" id="prevBtn" onclick="previousPage()" style="display: none;">Sebelumnya</button>
+          <span id="pageInfo"></span>
+          <button class="btn btn-secondary btn-small" id="nextBtn" onclick="nextPage()" style="display: none;">Berikutnya</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Journal Modal -->
+  <div id="journalModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Tambah Jurnal Mengajar</h2>
+        <button class="close" onclick="closeModal('journalModal')">&times;</button>
+      </div>
+      <form id="journalForm" onsubmit="handleSaveJournal(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="journalDate">Tanggal Mengajar</label>
+            <input type="date" id="journalDate" required>
+          </div>
+          <div class="form-group">
+            <label for="journalClass">Kelas</label>
+            <select id="journalClass" required>
+              <option value="">-- Pilih Kelas --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="journalKD">Kompetensi Dasar</label>
+            <select id="journalKD" required>
+              <option value="">-- Pilih KD --</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="journalModule">Modul Pembelajaran</label>
+            <select id="journalModule">
+              <option value="">-- Pilih Modul --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="journalSubject">Mata Pelajaran</label>
+          <input type="text" id="journalSubject" placeholder="Contoh: Basis Data" required>
+        </div>
+
+        <div class="form-group">
+          <label for="journalMaterial">Ringkasan Materi</label>
+          <textarea id="journalMaterial" placeholder="Deskripsi materi yang diajarkan" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="journalMethod">Metode Pembelajaran</label>
+          <select id="journalMethod" required>
+            <option value="">-- Pilih Metode --</option>
+            <option value="ceramah">Ceramah</option>
+            <option value="diskusi">Diskusi</option>
+            <option value="praktik">Praktik Langsung</option>
+            <option value="proyek">Proyek</option>
+            <option value="simulasi">Simulasi</option>
+            <option value="blended">Blended Learning</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="journalAttendance">Kehadiran Siswa</label>
+            <input type="number" id="journalAttendance" min="0" placeholder="Jumlah siswa hadir" required>
+          </div>
+          <div class="form-group">
+            <label for="journalMedia">Media yang Digunakan</label>
+            <input type="text" id="journalMedia" placeholder="Contoh: Proyektor, Whiteboard, PowerPoint">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="journalAssessment">Metode Penilaian</label>
+          <select id="journalAssessment" required>
+            <option value="">-- Pilih Metode Penilaian --</option>
+            <option value="tes_tertulis">Tes Tertulis</option>
+            <option value="tes_lisan">Tes Lisan</option>
+            <option value="praktik">Praktik</option>
+            <option value="tugas">Tugas</option>
+            <option value="proyek">Proyek</option>
+            <option value="observasi">Observasi</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="journalAchievement">Pencapaian Pembelajaran</label>
+          <textarea id="journalAchievement" placeholder="Hasil dan pencapaian pembelajaran pada pertemuan ini"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="journalChallenges">Kendala/Hambatan</label>
+          <textarea id="journalChallenges" placeholder="Hambatan yang dihadapi selama pembelajaran"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="journalFollowUp">Rencana Tindak Lanjut</label>
+          <textarea id="journalFollowUp" placeholder="Tindakan yang akan dilakukan di pertemuan berikutnya"></textarea>
+        </div>
+
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('journalModal')">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Journal Modal -->
+  <div id="viewJournalModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Detail Jurnal Mengajar</h2>
+        <button class="close" onclick="closeModal('viewJournalModal')">&times;</button>
+      </div>
+      <div id="viewJournalContent">
+        <!-- Content will be loaded here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    let currentPage = 1;
+    const pageSize = 10;
+    let totalJournals = 0;
+
+    window.addEventListener('DOMContentLoaded', async function() {
+      requireLogin();
+
+      const user = getLoggedInUser();
+      document.getElementById('userDisplay').textContent = user.full_name || user.email;
+
+      if (user.role !== 'Guru' && user.role !== 'Admin') {
+        showToast('Anda tidak memiliki akses ke halaman ini', 'danger');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1000);
+        return;
+      }
+
+      // Load data
+      await loadClasses();
+      await loadKompetensiDasar();
+      await loadTeachingModules();
+      await loadJournals();
+    });
+
+    async function loadClasses() {
+      try {
+        const classes = await api.getClasses();
+        const select = document.getElementById('journalClass');
+        if (classes && Array.isArray(classes)) {
+          const html = classes.map(cls => 
+            `<option value="${cls.id}">${cls.name} (Kelas ${cls.grade})</option>`
+          ).join('');
+          select.innerHTML = '<option value="">-- Pilih Kelas --</option>' + html;
+        }
+      } catch (error) {
+        console.error('Error loading classes:', error);
+      }
+    }
+
+    async function loadKompetensiDasar() {
+      try {
+        const kds = await api.getKompetensiDasar();
+        const select = document.getElementById('journalKD');
+        if (kds && Array.isArray(kds)) {
+          const html = kds.map(kd => 
+            `<option value="${kd.id}">${kd.code || 'KD'} - ${kd.description}</option>`
+          ).join('');
+          select.innerHTML = '<option value="">-- Pilih KD --</option>' + html;
+        }
+      } catch (error) {
+        console.error('Error loading KD:', error);
+      }
+    }
+
+    async function loadTeachingModules() {
+      try {
+        const modules = await api.getTeachingModules();
+        const select = document.getElementById('journalModule');
+        if (modules && Array.isArray(modules)) {
+          const html = modules.map(mod => 
+            `<option value="${mod.id}">${mod.title}</option>`
+          ).join('');
+          select.innerHTML = '<option value="">-- Pilih Modul --</option>' + html;
+        }
+      } catch (error) {
+        console.error('Error loading modules:', error);
+      }
+    }
+
+    async function loadJournals() {
+      try {
+        const skip = (currentPage - 1) * pageSize;
+        const filters = {
+          skip: skip,
+          limit: pageSize,
+          class_id: document.getElementById('filterClass').value || undefined,
+          date: document.getElementById('filterDate').value || undefined,
+          status: document.getElementById('filterStatus').value || undefined
+        };
+
+        const response = await api.getJournals(filters);
+        
+        if (response.journals) {
+          totalJournals = response.total || 0;
+          loadJournalTable(response.journals);
+          updatePagination();
+        }
+      } catch (error) {
+        console.error('Error loading journals:', error);
+        showToast('Gagal memuat jurnal', 'danger');
+      }
+    }
+
+    function loadJournalTable(journals) {
+      const tbody = document.getElementById('journalTableBody');
+      
+      if (!journals || journals.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = journals.map(journal => `
+        <tr>
+          <td>${formatDate(new Date(journal.date))}</td>
+          <td>${journal.class_name || '-'}</td>
+          <td>${journal.kd_description || '-'}</td>
+          <td>${journal.learning_method || '-'}</td>
+          <td>${journal.is_verified ? '<span class="badge badge-success">Terverifikasi</span>' : '<span class="badge badge-warning">Pending</span>'}</td>
+          <td>
+            <a href="javascript:viewJournal(${journal.id})">Lihat</a>
+            <a href="javascript:editJournal(${journal.id})">Edit</a>
+            <a href="javascript:deleteJournal(${journal.id})">Hapus</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updatePagination() {
+      const totalPages = Math.ceil(totalJournals / pageSize);
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const pageInfo = document.getElementById('pageInfo');
+
+      pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages}`;
+
+      prevBtn.style.display = currentPage > 1 ? 'inline-block' : 'none';
+      nextBtn.style.display = currentPage < totalPages ? 'inline-block' : 'none';
+    }
+
+    function previousPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        loadJournals();
+      }
+    }
+
+    function nextPage() {
+      const totalPages = Math.ceil(totalJournals / pageSize);
+      if (currentPage < totalPages) {
+        currentPage++;
+        loadJournals();
+      }
+    }
+
+    function applyFilters() {
+      currentPage = 1;
+      loadJournals();
+    }
+
+    function showAddJournalModal() {
+      document.getElementById('modalTitle').textContent = 'Tambah Jurnal Mengajar';
+      document.getElementById('journalForm').reset();
+      document.getElementById('journalModal').classList.add('show');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    async function handleSaveJournal(event) {
+      event.preventDefault();
+
+      const journalData = {
+        date: document.getElementById('journalDate').value,
+        class_id: document.getElementById('journalClass').value,
+        kd_id: document.getElementById('journalKD').value,
+        module_id: document.getElementById('journalModule').value || null,
+        subject: document.getElementById('journalSubject').value,
+        material_summary: document.getElementById('journalMaterial').value,
+        learning_method: document.getElementById('journalMethod').value,
+        student_attendance: parseInt(document.getElementById('journalAttendance').value),
+        media_used: document.getElementById('journalMedia').value,
+        assessment_method: document.getElementById('journalAssessment').value,
+        achievement_notes: document.getElementById('journalAchievement').value,
+        challenges: document.getElementById('journalChallenges').value,
+        follow_up_notes: document.getElementById('journalFollowUp').value
+      };
+
+      try {
+        await api.createJournal(journalData);
+        showToast('Jurnal berhasil disimpan', 'success');
+        closeModal('journalModal');
+        currentPage = 1;
+        await loadJournals();
+      } catch (error) {
+        console.error('Error saving journal:', error);
+        showToast('Gagal menyimpan jurnal: ' + (error.message || 'Unknown error'), 'danger');
+      }
+    }
+
+    async function viewJournal(journalId) {
+      try {
+        const journal = await api.getJournal(journalId);
+        const content = document.getElementById('viewJournalContent');
+
+        content.innerHTML = `
+          <div class="card-body">
+            <div class="form-row">
+              <div>
+                <strong>Tanggal:</strong> ${formatDate(new Date(journal.date))}
+              </div>
+              <div>
+                <strong>Kelas:</strong> ${journal.class_name || '-'}
+              </div>
+            </div>
+
+            <div class="form-row mt-20">
+              <div>
+                <strong>Kompetensi Dasar:</strong> ${journal.kd_description || '-'}
+              </div>
+              <div>
+                <strong>Status:</strong> ${journal.is_verified ? '<span class="badge badge-success">Terverifikasi</span>' : '<span class="badge badge-warning">Pending</span>'}
+              </div>
+            </div>
+
+            <div class="mt-20">
+              <strong>Mata Pelajaran:</strong> ${journal.subject || '-'}
+            </div>
+
+            <div class="mt-20">
+              <strong>Ringkasan Materi:</strong>
+              <p>${journal.material_summary || '-'}</p>
+            </div>
+
+            <div class="form-row mt-20">
+              <div>
+                <strong>Metode Pembelajaran:</strong> ${journal.learning_method || '-'}
+              </div>
+              <div>
+                <strong>Kehadiran Siswa:</strong> ${journal.student_attendance || 0} siswa
+              </div>
+            </div>
+
+            <div class="form-row mt-20">
+              <div>
+                <strong>Media Pembelajaran:</strong> ${journal.media_used || '-'}
+              </div>
+              <div>
+                <strong>Metode Penilaian:</strong> ${journal.assessment_method || '-'}
+              </div>
+            </div>
+
+            <div class="mt-20">
+              <strong>Pencapaian Pembelajaran:</strong>
+              <p>${journal.achievement_notes || '-'}</p>
+            </div>
+
+            <div class="mt-20">
+              <strong>Kendala/Hambatan:</strong>
+              <p>${journal.challenges || '-'}</p>
+            </div>
+
+            <div class="mt-20">
+              <strong>Rencana Tindak Lanjut:</strong>
+              <p>${journal.follow_up_notes || '-'}</p>
+            </div>
+
+            ${journal.verified_by ? `
+              <div class="alert alert-success mt-20">
+                <strong>Verifikasi:</strong> Diverifikasi oleh ${journal.verified_by_name || 'Admin'} pada ${formatDate(new Date(journal.verified_at))}
+              </div>
+            ` : ''}
+          </div>
+        `;
+
+        document.getElementById('viewJournalModal').classList.add('show');
+      } catch (error) {
+        console.error('Error loading journal:', error);
+        showToast('Gagal memuat detail jurnal', 'danger');
+      }
+    }
+
+    function editJournal(journalId) {
+      showToast('Edit jurnal belum sepenuhnya diimplementasikan', 'info');
+    }
+
+    async function deleteJournal(journalId) {
+      if (confirm('Apakah Anda yakin ingin menghapus jurnal ini?')) {
+        try {
+          await api.deleteJournal(journalId);
+          showToast('Jurnal berhasil dihapus', 'success');
+          await loadJournals();
+        } catch (error) {
+          console.error('Error deleting journal:', error);
+          showToast('Gagal menghapus jurnal', 'danger');
+        }
+      }
+    }
+
+    function logout() {
+      api.logout();
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      showToast('Logout berhasil', 'success');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 500);
+    }
+  </script>
+</body>
+
+</html>

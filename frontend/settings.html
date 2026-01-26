@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pengaturan - Jurnal Mengajar & Absensi Siswa</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">Jurnal Mengajar & Absensi</div>
+    <ul class="navbar-menu">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="settings.html">Pengaturan</a></li>
+    </ul>
+    <div class="user-menu">
+      <span id="userDisplay"></span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container" style="max-width: 600px;">
+    <!-- Profile Settings -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Profil Saya</h2>
+      </div>
+      <div class="card-body">
+        <form id="profileForm" onsubmit="handleUpdateProfile(event)">
+          <div class="form-group">
+            <label for="profileEmail">Email</label>
+            <input type="email" id="profileEmail" disabled style="background-color: #f5f5f5;">
+          </div>
+
+          <div class="form-group">
+            <label for="profileFullName">Nama Lengkap</label>
+            <input type="text" id="profileFullName" required>
+          </div>
+
+          <div class="form-group">
+            <label for="profileRole">Role</label>
+            <input type="text" id="profileRole" disabled style="background-color: #f5f5f5;">
+          </div>
+
+          <div class="form-group">
+            <label for="profileStatus">Status</label>
+            <input type="text" id="profileStatus" disabled style="background-color: #f5f5f5;">
+          </div>
+
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Change Password -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Ubah Password</h2>
+      </div>
+      <div class="card-body">
+        <form id="passwordForm" onsubmit="handleChangePassword(event)">
+          <div class="form-group">
+            <label for="oldPassword">Password Lama</label>
+            <input type="password" id="oldPassword" placeholder="Masukkan password lama" required>
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">Password Baru</label>
+            <input type="password" id="newPassword" placeholder="Masukkan password baru" required>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Konfirmasi Password Baru</label>
+            <input type="password" id="confirmPassword" placeholder="Ulangi password baru" required>
+          </div>
+
+          <div id="passwordError" style="color: #f44336; margin-bottom: 16px; display: none;"></div>
+
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary">Ubah Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Notification Settings -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Pengaturan Notifikasi</h2>
+      </div>
+      <div class="card-body">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="display: flex; align-items: center; cursor: pointer;">
+            <input type="checkbox" id="emailNotifications" style="width: auto; margin-right: 10px;">
+            <span>Terima notifikasi via email</span>
+          </label>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="display: flex; align-items: center; cursor: pointer;">
+            <input type="checkbox" id="attendanceReminder" style="width: auto; margin-right: 10px;">
+            <span>Pengingat absensi harian</span>
+          </label>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label style="display: flex; align-items: center; cursor: pointer;">
+            <input type="checkbox" id="journalReminder" style="width: auto; margin-right: 10px;">
+            <span>Pengingat jurnal mengajar</span>
+          </label>
+        </div>
+
+        <div class="card-footer">
+          <button type="button" class="btn btn-primary" onclick="saveNotificationSettings()">Simpan Pengaturan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Application Info -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Informasi Aplikasi</h2>
+      </div>
+      <div class="card-body">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <strong>Jurnal Mengajar & Absensi Siswa</strong>
+          <p style="color: #999; margin: 8px 0 0 0;">Versi 1.0.0</p>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <strong>Sekolah</strong>
+          <p style="color: #999; margin: 8px 0 0 0;">SMK Negeri 1 Lemahabang</p>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <strong>Jurusan</strong>
+          <p style="color: #999; margin: 8px 0 0 0;">Teknik Komputer & Jaringan</p>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <strong>Tahun Akademik</strong>
+          <p style="color: #999; margin: 8px 0 0 0;" id="academicYear">2024/2025</p>
+        </div>
+
+        <div class="form-group">
+          <strong>Backend API</strong>
+          <p style="color: #999; margin: 8px 0 0 0;" id="apiStatus">Memeriksa status...</p>
+        </div>
+
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" onclick="checkApiStatus()">Periksa Koneksi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="card" style="border-top-color: #f44336;">
+      <div class="card-header">
+        <h2 style="color: #f44336;">Zona Berbahaya</h2>
+      </div>
+      <div class="card-body">
+        <div style="padding: 16px; background-color: #FFEBEE; border-radius: 4px; margin-bottom: 16px;">
+          <strong style="color: #f44336;">Hapus Akun</strong>
+          <p style="color: #999; margin: 8px 0 0 0; font-size: 14px;">Menghapus akun akan menghapus semua data Anda secara permanen. Tindakan ini tidak dapat dibatalkan.</p>
+        </div>
+
+        <div class="card-footer">
+          <button type="button" class="btn btn-danger" onclick="deleteAccount()">Hapus Akun Saya</button>
+          <button type="button" class="btn btn-secondary" onclick="goBack()">Kembali ke Dashboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    let currentUser = null;
+
+    window.addEventListener('DOMContentLoaded', async function() {
+      requireLogin();
+
+      currentUser = getLoggedInUser();
+      document.getElementById('userDisplay').textContent = currentUser.full_name || currentUser.email;
+
+      // Load profile data
+      document.getElementById('profileEmail').value = currentUser.email;
+      document.getElementById('profileFullName').value = currentUser.full_name || '';
+      document.getElementById('profileRole').value = currentUser.role;
+      document.getElementById('profileStatus').value = currentUser.is_active ? 'Aktif' : 'Nonaktif';
+
+      // Load notification settings from localStorage
+      loadNotificationSettings();
+
+      // Check API status
+      await checkApiStatus();
+    });
+
+    async function handleUpdateProfile(event) {
+      event.preventDefault();
+
+      const fullName = document.getElementById('profileFullName').value;
+
+      try {
+        // This would call an update profile endpoint (to be implemented in backend)
+        showToast('Update profil belum diimplementasikan di backend', 'info');
+        // await api.updateProfile({ full_name: fullName });
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        showToast('Gagal memperbarui profil', 'danger');
+      }
+    }
+
+    async function handleChangePassword(event) {
+      event.preventDefault();
+
+      const oldPassword = document.getElementById('oldPassword').value;
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const errorDiv = document.getElementById('passwordError');
+
+      // Validate
+      if (newPassword !== confirmPassword) {
+        errorDiv.textContent = 'Password baru tidak cocok';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        errorDiv.textContent = 'Password baru minimal 8 karakter';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      try {
+        // This would call a change password endpoint (to be implemented in backend)
+        showToast('Ubah password belum diimplementasikan di backend', 'info');
+        // await api.changePassword({ old_password: oldPassword, new_password: newPassword });
+        
+        // Clear form
+        document.getElementById('passwordForm').reset();
+        errorDiv.style.display = 'none';
+      } catch (error) {
+        console.error('Error changing password:', error);
+        errorDiv.textContent = error.message || 'Gagal mengubah password';
+        errorDiv.style.display = 'block';
+      }
+    }
+
+    function loadNotificationSettings() {
+      const settings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+      document.getElementById('emailNotifications').checked = settings.email !== false;
+      document.getElementById('attendanceReminder').checked = settings.attendanceReminder !== false;
+      document.getElementById('journalReminder').checked = settings.journalReminder !== false;
+    }
+
+    function saveNotificationSettings() {
+      const settings = {
+        email: document.getElementById('emailNotifications').checked,
+        attendanceReminder: document.getElementById('attendanceReminder').checked,
+        journalReminder: document.getElementById('journalReminder').checked
+      };
+
+      localStorage.setItem('notificationSettings', JSON.stringify(settings));
+      showToast('Pengaturan notifikasi berhasil disimpan', 'success');
+    }
+
+    async function checkApiStatus() {
+      try {
+        const response = await fetch(api.baseURL + '/health');
+        if (response.ok) {
+          document.getElementById('apiStatus').innerHTML = 
+            '<span style="color: #4CAF50;">✓ Backend API Connected</span>';
+        } else {
+          throw new Error('API response not ok');
+        }
+      } catch (error) {
+        document.getElementById('apiStatus').innerHTML = 
+          '<span style="color: #f44336;">✗ Backend API Offline</span><br><small>Pastikan backend server sedang berjalan</small>';
+      }
+    }
+
+    function deleteAccount() {
+      const confirmation = prompt(
+        'Tipe "HAPUS AKUN SAYA" untuk mengkonfirmasi penghapusan akun:\n\nPeringatan: Tindakan ini tidak dapat dibatalkan!'
+      );
+
+      if (confirmation === 'HAPUS AKUN SAYA') {
+        try {
+          // This would call a delete account endpoint (to be implemented in backend)
+          showToast('Penghapusan akun belum diimplementasikan di backend', 'info');
+          // await api.deleteAccount();
+          
+          // Logout
+          api.logout();
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          showToast('Akun berhasil dihapus', 'success');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 1000);
+        } catch (error) {
+          console.error('Error deleting account:', error);
+          showToast('Gagal menghapus akun', 'danger');
+        }
+      } else if (confirmation !== null) {
+        showToast('Konfirmasi tidak cocok', 'warning');
+      }
+    }
+
+    function goBack() {
+      window.location.href = 'dashboard.html';
+    }
+
+    function logout() {
+      api.logout();
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      showToast('Logout berhasil', 'success');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 500);
+    }
+  </script>
+</body>
+
+</html>

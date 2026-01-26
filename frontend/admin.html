@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Jurnal Mengajar & Absensi Siswa</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">Jurnal Mengajar & Absensi</div>
+    <ul class="navbar-menu">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="admin.html">Admin Panel</a></li>
+      <li><a href="settings.html">Pengaturan</a></li>
+    </ul>
+    <div class="user-menu">
+      <span id="userDisplay"></span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Page Header -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Admin Panel</h2>
+      </div>
+      <div class="card-body">
+        <p style="margin: 0; color: #666;">Kelola pengguna, kelas, kurikulum, dan sistem sekolah di sini.</p>
+      </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="card">
+      <div class="card-body" style="padding: 0;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); border-bottom: 2px solid #ddd;">
+          <button class="tab-button active" onclick="switchTab('users')" style="padding: 16px; border: none; background: none; cursor: pointer; border-bottom: 3px solid #2196F3; color: #2196F3; font-weight: 600;">Pengguna</button>
+          <button class="tab-button" onclick="switchTab('classes')" style="padding: 16px; border: none; background: none; cursor: pointer; color: #999; font-weight: 600;">Kelas</button>
+          <button class="tab-button" onclick="switchTab('curriculum')" style="padding: 16px; border: none; background: none; cursor: pointer; color: #999; font-weight: 600;">Kurikulum</button>
+          <button class="tab-button" onclick="switchTab('attendance')" style="padding: 16px; border: none; background: none; cursor: pointer; color: #999; font-weight: 600;">Absensi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="usersTab" class="tab-content">
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>Manajemen Pengguna</h2>
+          <button class="btn btn-primary" onclick="showAddUserModal()">+ Tambah Pengguna</button>
+        </div>
+        <div class="card-body">
+          <div class="form-group" style="margin-bottom: 16px;">
+            <input type="text" id="userSearch" placeholder="Cari email atau nama..." onkeyup="filterUsers()" style="width: 100%; max-width: 400px;">
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Nama</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Terakhir Login</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Classes Tab -->
+    <div id="classesTab" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>Manajemen Kelas</h2>
+          <button class="btn btn-primary" onclick="showAddClassModal()">+ Tambah Kelas</button>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Nama Kelas</th>
+                  <th>Tingkat</th>
+                  <th>Jurusan</th>
+                  <th>Wali Kelas</th>
+                  <th>Jumlah Siswa</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="classesTableBody">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Curriculum Tab -->
+    <div id="curriculumTab" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>Manajemen Kurikulum</h2>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary btn-small" onclick="showAddKIModal()">+ KI/KD</button>
+            <button class="btn btn-primary btn-small" onclick="showAddATPModal()">+ ATP</button>
+            <button class="btn btn-primary btn-small" onclick="showAddModuleModal()">+ Modul</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KI/KD Section -->
+      <div class="card">
+        <div class="card-header">
+          <h3 style="margin: 0; font-size: 18px;">Kompetensi Inti & Dasar (Kurikulum 2013)</h3>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Tingkat</th>
+                  <th>KI</th>
+                  <th>KD</th>
+                  <th>Deskripsi</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="kiTableBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ATP Section -->
+      <div class="card">
+        <div class="card-header">
+          <h3 style="margin: 0; font-size: 18px;">Aturan Tujuan Pembelajaran (Kurikulum Merdeka)</h3>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Tingkat</th>
+                  <th>Fase</th>
+                  <th>Tujuan Pembelajaran</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="atpTableBody">
+                <tr>
+                  <td colspan="4" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modules Section -->
+      <div class="card">
+        <div class="card-header">
+          <h3 style="margin: 0; font-size: 18px;">Modul Pembelajaran</h3>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Judul Modul</th>
+                  <th>ATP/KD</th>
+                  <th>Durasi (Jam)</th>
+                  <th>File</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="modulesTableBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance Tab -->
+    <div id="attendanceTab" class="tab-content hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Laporan Absensi</h2>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reportClass">Kelas</label>
+              <select id="reportClass" onchange="generateAttendanceReport()">
+                <option value="">Semua Kelas</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="reportMonth">Bulan</label>
+              <input type="month" id="reportMonth" onchange="generateAttendanceReport()">
+            </div>
+          </div>
+
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Siswa</th>
+                  <th>Hadir</th>
+                  <th>Sakit</th>
+                  <th>Izin</th>
+                  <th>Alfa</th>
+                  <th>Persentase</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceReportBody">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-footer">
+            <button class="btn btn-secondary" onclick="exportAttendanceReport()">📥 Export Excel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="addUserModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Tambah Pengguna</h2>
+        <button class="close" onclick="closeModal('addUserModal')">&times;</button>
+      </div>
+      <form id="addUserForm" onsubmit="handleAddUser(event)">
+        <div class="form-group">
+          <label for="newUserEmail">Email</label>
+          <input type="email" id="newUserEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="newUserName">Nama Lengkap</label>
+          <input type="text" id="newUserName" required>
+        </div>
+        <div class="form-group">
+          <label for="newUserRole">Role</label>
+          <select id="newUserRole" required>
+            <option value="">-- Pilih Role --</option>
+            <option value="Admin">Admin</option>
+            <option value="Guru">Guru</option>
+            <option value="Siswa">Siswa</option>
+            <option value="Kepala_Sekolah">Kepala Sekolah</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="newUserPassword">Password</label>
+          <input type="password" id="newUserPassword" required>
+        </div>
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="addClassModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Tambah Kelas</h2>
+        <button class="close" onclick="closeModal('addClassModal')">&times;</button>
+      </div>
+      <form id="addClassForm" onsubmit="handleAddClass(event)">
+        <div class="form-group">
+          <label for="newClassName">Nama Kelas</label>
+          <input type="text" id="newClassName" placeholder="Contoh: X TKJ 1" required>
+        </div>
+        <div class="form-group">
+          <label for="newClassGrade">Tingkat</label>
+          <select id="newClassGrade" required>
+            <option value="">-- Pilih Tingkat --</option>
+            <option value="10">Kelas X</option>
+            <option value="11">Kelas XI</option>
+            <option value="12">Kelas XII</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="newClassDept">Jurusan</label>
+          <input type="text" id="newClassDept" placeholder="Teknik Komputer & Jaringan" required>
+        </div>
+        <div class="form-group">
+          <label for="newClassTeacher">Wali Kelas</label>
+          <select id="newClassTeacher"></select>
+        </div>
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addClassModal')">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    let allUsers = [];
+    let currentUser = null;
+
+    window.addEventListener('DOMContentLoaded', async function() {
+      requireLogin();
+
+      currentUser = getLoggedInUser();
+      document.getElementById('userDisplay').textContent = currentUser.full_name || currentUser.email;
+
+      if (currentUser.role !== 'Admin' && currentUser.role !== 'Kepala_Sekolah') {
+        showToast('Anda tidak memiliki akses ke admin panel', 'danger');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1000);
+        return;
+      }
+
+      // Load data
+      await loadUsers();
+      await loadClasses();
+      await loadCurriculum();
+      await loadAttendanceReport();
+    });
+
+    // Tab switching
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.add('hidden');
+      });
+
+      // Update tab buttons
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.style.color = '#999';
+        btn.style.borderBottom = 'none';
+      });
+
+      // Show selected tab
+      const tabId = tabName + 'Tab';
+      if (document.getElementById(tabId)) {
+        document.getElementById(tabId).classList.remove('hidden');
+      }
+
+      // Update tab button style
+      event.target.style.color = '#2196F3';
+      event.target.style.borderBottom = '3px solid #2196F3';
+    }
+
+    // Users Management
+    async function loadUsers() {
+      try {
+        // In a real application, this would fetch from the API
+        showToast('Data pengguna akan dimuat dari backend API', 'info');
+      } catch (error) {
+        console.error('Error loading users:', error);
+        showToast('Gagal memuat data pengguna', 'danger');
+      }
+    }
+
+    function filterUsers() {
+      const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+      const tbody = document.getElementById('usersTableBody');
+      const rows = tbody.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+      });
+    }
+
+    function showAddUserModal() {
+      document.getElementById('addUserForm').reset();
+      document.getElementById('addUserModal').classList.add('show');
+    }
+
+    async function handleAddUser(event) {
+      event.preventDefault();
+      showToast('Fitur ini akan diimplementasikan di backend', 'info');
+      closeModal('addUserModal');
+    }
+
+    // Classes Management
+    async function loadClasses() {
+      try {
+        const classes = await api.getClasses();
+        if (classes && Array.isArray(classes)) {
+          loadClassesTable(classes);
+          loadClassesSelect(classes);
+        }
+      } catch (error) {
+        console.error('Error loading classes:', error);
+      }
+    }
+
+    function loadClassesTable(classes) {
+      const tbody = document.getElementById('classesTableBody');
+      if (!classes || classes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = classes.map(cls => `
+        <tr>
+          <td>${cls.name}</td>
+          <td>Kelas ${cls.grade}</td>
+          <td>${cls.department_name || '-'}</td>
+          <td>${cls.homeroom_teacher || '-'}</td>
+          <td>${cls.student_count || 0}</td>
+          <td>
+            <a href="javascript:editClass(${cls.id})">Edit</a>
+            <a href="javascript:deleteClass(${cls.id})">Hapus</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function loadClassesSelect(classes) {
+      const select = document.getElementById('newClassTeacher');
+      const reportSelect = document.getElementById('reportClass');
+
+      if (classes && Array.isArray(classes)) {
+        select.innerHTML = '<option value="">-- Pilih Wali Kelas --</option>' + 
+          classes.map(cls => `<option value="${cls.id}">${cls.name}</option>`).join('');
+        reportSelect.innerHTML = '<option value="">Semua Kelas</option>' + 
+          classes.map(cls => `<option value="${cls.id}">${cls.name}</option>`).join('');
+      }
+    }
+
+    function showAddClassModal() {
+      document.getElementById('addClassForm').reset();
+      document.getElementById('addClassModal').classList.add('show');
+    }
+
+    async function handleAddClass(event) {
+      event.preventDefault();
+      showToast('Fitur ini akan diimplementasikan di backend', 'info');
+      closeModal('addClassModal');
+    }
+
+    // Curriculum Management
+    async function loadCurriculum() {
+      try {
+        const kds = await api.getKompetensiDasar();
+        const atps = await api.getAturanTujuanPembelajaran();
+        const modules = await api.getTeachingModules();
+
+        if (kds) loadKITable(kds);
+        if (atps) loadATPTable(atps);
+        if (modules) loadModulesTable(modules);
+      } catch (error) {
+        console.error('Error loading curriculum:', error);
+      }
+    }
+
+    function loadKITable(kds) {
+      const tbody = document.getElementById('kiTableBody');
+      if (!kds || kds.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = kds.map(kd => `
+        <tr>
+          <td>Kelas ${kd.grade || '-'}</td>
+          <td>${kd.ki_number || '-'}</td>
+          <td>${kd.code || 'KD'}</td>
+          <td>${kd.description || '-'}</td>
+          <td>
+            <a href="javascript:editKI(${kd.id})">Edit</a>
+            <a href="javascript:deleteKI(${kd.id})">Hapus</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function loadATPTable(atps) {
+      const tbody = document.getElementById('atpTableBody');
+      if (!atps || atps.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = atps.map(atp => `
+        <tr>
+          <td>Kelas ${atp.grade || '-'}</td>
+          <td>Fase ${atp.fase || '-'}</td>
+          <td>${atp.learning_objectives || '-'}</td>
+          <td>
+            <a href="javascript:editATP(${atp.id})">Edit</a>
+            <a href="javascript:deleteATP(${atp.id})">Hapus</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function loadModulesTable(modules) {
+      const tbody = document.getElementById('modulesTableBody');
+      if (!modules || modules.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = modules.map(mod => `
+        <tr>
+          <td>${mod.title || '-'}</td>
+          <td>${mod.atp_id ? 'ATP' : 'KD'}</td>
+          <td>${mod.duration_hours || 0} jam</td>
+          <td>${mod.file_path ? '<a href="#">Download</a>' : '-'}</td>
+          <td>
+            <a href="javascript:editModule(${mod.id})">Edit</a>
+            <a href="javascript:deleteModule(${mod.id})">Hapus</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function showAddKIModal() {
+      showToast('Tambah KI/KD belum diimplementasikan', 'info');
+    }
+
+    function showAddATPModal() {
+      showToast('Tambah ATP belum diimplementasikan', 'info');
+    }
+
+    function showAddModuleModal() {
+      showToast('Tambah Modul belum diimplementasikan', 'info');
+    }
+
+    // Attendance Report
+    async function loadAttendanceReport() {
+      await generateAttendanceReport();
+    }
+
+    async function generateAttendanceReport() {
+      try {
+        showToast('Laporan absensi akan dimuat dari backend', 'info');
+      } catch (error) {
+        console.error('Error generating report:', error);
+      }
+    }
+
+    function exportAttendanceReport() {
+      showToast('Export excel belum diimplementasikan', 'info');
+    }
+
+    // Modal functions
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    // Placeholder functions
+    function editClass(classId) { showToast('Edit belum diimplementasikan', 'info'); }
+    function deleteClass(classId) { if(confirm('Hapus kelas?')) showToast('Delete belum diimplementasikan', 'info'); }
+    function editKI(kiId) { showToast('Edit KI belum diimplementasikan', 'info'); }
+    function deleteKI(kiId) { if(confirm('Hapus KI?')) showToast('Delete KI belum diimplementasikan', 'info'); }
+    function editATP(atpId) { showToast('Edit ATP belum diimplementasikan', 'info'); }
+    function deleteATP(atpId) { if(confirm('Hapus ATP?')) showToast('Delete ATP belum diimplementasikan', 'info'); }
+    function editModule(moduleId) { showToast('Edit modul belum diimplementasikan', 'info'); }
+    function deleteModule(moduleId) { if(confirm('Hapus modul?')) showToast('Delete modul belum diimplementasikan', 'info'); }
+
+    function logout() {
+      api.logout();
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      showToast('Logout berhasil', 'success');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 500);
+    }
+  </script>
+</body>
+
+</html>

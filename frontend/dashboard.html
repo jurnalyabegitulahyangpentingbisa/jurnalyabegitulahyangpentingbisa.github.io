@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Jurnal Mengajar & Absensi Siswa</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">Jurnal Mengajar & Absensi</div>
+    <ul class="navbar-menu">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="journal.html" id="journalLink" class="hidden">Jurnal Mengajar</a></li>
+      <li><a href="attendance.html" id="attendanceLink" class="hidden">Absensi</a></li>
+      <li><a href="admin.html" id="adminLink" class="hidden">Admin</a></li>
+      <li><a href="settings.html">Pengaturan</a></li>
+    </ul>
+    <div class="user-menu">
+      <span id="userDisplay"></span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Dashboard Admin</h2>
+        </div>
+        <div class="card-body">
+          <div class="grid grid-3">
+            <div class="stat-card">
+              <h3>Total Guru</h3>
+              <div class="value" id="totalTeachers">-</div>
+            </div>
+            <div class="stat-card success">
+              <h3>Total Siswa</h3>
+              <div class="value" id="totalStudents">-</div>
+            </div>
+            <div class="stat-card warning">
+              <h3>Total Kelas</h3>
+              <div class="value" id="totalClasses">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manajemen Pengguna -->
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>Manajemen Pengguna</h2>
+          <button class="btn btn-primary btn-small" onclick="showAddUserModal()">Tambah Pengguna</button>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Nama</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manajemen Kelas -->
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>Manajemen Kelas</h2>
+          <button class="btn btn-primary btn-small" onclick="showAddClassModal()">Tambah Kelas</button>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Nama Kelas</th>
+                  <th>Tingkat</th>
+                  <th>Jurusan</th>
+                  <th>Wali Kelas</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="classTableBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Teacher Dashboard -->
+    <div id="teacherDashboard" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Dashboard Guru</h2>
+        </div>
+        <div class="card-body">
+          <div class="grid grid-3">
+            <div class="stat-card">
+              <h3>Jurnal Dibuat</h3>
+              <div class="value" id="journalCount">-</div>
+            </div>
+            <div class="stat-card success">
+              <h3>Jurnal Terverifikasi</h3>
+              <div class="value" id="verifiedJournalCount">-</div>
+            </div>
+            <div class="stat-card warning">
+              <h3>Kelas Diampu</h3>
+              <div class="value" id="classCount">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jurnal Terbaru -->
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>Jurnal Mengajar Terbaru</h2>
+          <button class="btn btn-primary btn-small" onclick="goToJournal()">Lihat Semua</button>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Kelas</th>
+                  <th>Kompetensi</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="recentJournalBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Dashboard -->
+    <div id="studentDashboard" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Dashboard Siswa</h2>
+        </div>
+        <div class="card-body">
+          <div class="grid grid-3">
+            <div class="stat-card">
+              <h3>Kehadiran</h3>
+              <div class="value" id="attendancePercentage">-</div>
+            </div>
+            <div class="stat-card success">
+              <h3>Hari Hadir</h3>
+              <div class="value" id="presentDays">-</div>
+            </div>
+            <div class="stat-card danger">
+              <h3>Hari Absen</h3>
+              <div class="value" id="absentDays">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Riwayat Absensi -->
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>Riwayat Absensi Bulan Ini</h2>
+          <button class="btn btn-primary btn-small" onclick="goToAttendance()">Lihat Semua</button>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Kelas</th>
+                  <th>Status</th>
+                  <th>Keterangan</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceHistoryBody">
+                <tr>
+                  <td colspan="4" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="addUserModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Tambah Pengguna</h2>
+        <button class="close" onclick="closeModal('addUserModal')">&times;</button>
+      </div>
+      <form id="addUserForm" onsubmit="handleAddUser(event)">
+        <div class="form-group">
+          <label for="userEmail">Email</label>
+          <input type="email" id="userEmail" required>
+        </div>
+        <div class="form-group">
+          <label for="userName">Nama Lengkap</label>
+          <input type="text" id="userName" required>
+        </div>
+        <div class="form-group">
+          <label for="userRole">Role</label>
+          <select id="userRole" required>
+            <option value="">-- Pilih Role --</option>
+            <option value="Admin">Admin</option>
+            <option value="Guru">Guru</option>
+            <option value="Siswa">Siswa</option>
+            <option value="Kepala_Sekolah">Kepala Sekolah</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="userPassword">Password</label>
+          <input type="password" id="userPassword" required>
+        </div>
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="addClassModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Tambah Kelas</h2>
+        <button class="close" onclick="closeModal('addClassModal')">&times;</button>
+      </div>
+      <form id="addClassForm" onsubmit="handleAddClass(event)">
+        <div class="form-group">
+          <label for="className">Nama Kelas</label>
+          <input type="text" id="className" placeholder="Contoh: X TKJ 1" required>
+        </div>
+        <div class="form-group">
+          <label for="classGrade">Tingkat</label>
+          <select id="classGrade" required>
+            <option value="">-- Pilih Tingkat --</option>
+            <option value="10">Kelas X</option>
+            <option value="11">Kelas XI</option>
+            <option value="12">Kelas XII</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="classDepartment">Jurusan</label>
+          <input type="text" id="classDepartment" placeholder="Teknik Komputer & Jaringan" required>
+        </div>
+        <div class="form-group">
+          <label for="classTeacher">Wali Kelas (Email)</label>
+          <input type="email" id="classTeacher">
+        </div>
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('addClassModal')">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    const currentUser = null;
+
+    window.addEventListener('DOMContentLoaded', async function() {
+      requireLogin();
+
+      const user = getLoggedInUser();
+      currentUser = user;
+
+      // Update user display
+      document.getElementById('userDisplay').textContent = user.full_name || user.email;
+
+      // Show appropriate dashboard based on role
+      const dashboardMap = {
+        'Admin': 'adminDashboard',
+        'Guru': 'teacherDashboard',
+        'Siswa': 'studentDashboard',
+        'Kepala_Sekolah': 'adminDashboard'
+      };
+
+      const dashboardId = dashboardMap[user.role] || 'studentDashboard';
+      document.getElementById(dashboardId).classList.remove('hidden');
+
+      // Show/hide navigation links based on role
+      if (user.role === 'Guru') {
+        document.getElementById('journalLink').classList.remove('hidden');
+        document.getElementById('attendanceLink').classList.remove('hidden');
+      } else if (user.role === 'Siswa') {
+        document.getElementById('attendanceLink').classList.remove('hidden');
+      } else if (user.role === 'Admin') {
+        document.getElementById('adminLink').classList.remove('hidden');
+        document.getElementById('journalLink').classList.remove('hidden');
+        document.getElementById('attendanceLink').classList.remove('hidden');
+      }
+
+      // Load dashboard data
+      if (user.role === 'Admin' || user.role === 'Kepala_Sekolah') {
+        await loadAdminDashboard();
+      } else if (user.role === 'Guru') {
+        await loadTeacherDashboard();
+      } else if (user.role === 'Siswa') {
+        await loadStudentDashboard();
+      }
+    });
+
+    async function loadAdminDashboard() {
+      try {
+        const dashboard = await api.getAdminDashboard();
+        document.getElementById('totalTeachers').textContent = dashboard.total_teachers || 0;
+        document.getElementById('totalStudents').textContent = dashboard.total_students || 0;
+        document.getElementById('totalClasses').textContent = dashboard.total_classes || 0;
+
+        // Load users table
+        if (dashboard.recent_users) {
+          loadUsersTable(dashboard.recent_users);
+        }
+
+        // Load classes table
+        if (dashboard.classes) {
+          loadClassesTable(dashboard.classes);
+        }
+      } catch (error) {
+        console.error('Error loading admin dashboard:', error);
+        showToast('Gagal memuat data dashboard', 'danger');
+      }
+    }
+
+    async function loadTeacherDashboard() {
+      try {
+        const dashboard = await api.getTeacherDashboard();
+        document.getElementById('journalCount').textContent = dashboard.total_journals || 0;
+        document.getElementById('verifiedJournalCount').textContent = dashboard.verified_journals || 0;
+        document.getElementById('classCount').textContent = dashboard.classes_count || 0;
+
+        // Load recent journals
+        if (dashboard.recent_journals) {
+          loadRecentJournals(dashboard.recent_journals);
+        }
+      } catch (error) {
+        console.error('Error loading teacher dashboard:', error);
+        showToast('Gagal memuat data dashboard', 'danger');
+      }
+    }
+
+    async function loadStudentDashboard() {
+      try {
+        const dashboard = await api.getStudentDashboard();
+        document.getElementById('attendancePercentage').textContent = (dashboard.attendance_percentage || 0).toFixed(1) + '%';
+        document.getElementById('presentDays').textContent = dashboard.present_days || 0;
+        document.getElementById('absentDays').textContent = dashboard.absent_days || 0;
+
+        // Load attendance history
+        if (dashboard.recent_attendance) {
+          loadAttendanceHistory(dashboard.recent_attendance);
+        }
+      } catch (error) {
+        console.error('Error loading student dashboard:', error);
+        showToast('Gagal memuat data dashboard', 'danger');
+      }
+    }
+
+    function loadUsersTable(users) {
+      const tbody = document.getElementById('userTableBody');
+      if (!users || users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = users.map(user => `
+        <tr>
+          <td>${user.email}</td>
+          <td>${user.full_name || '-'}</td>
+          <td><span class="badge badge-primary">${user.role}</span></td>
+          <td>${user.is_active ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-danger">Nonaktif</span>'}</td>
+          <td>
+            <a href="javascript:editUser(${user.id})">Edit</a>
+            <a href="javascript:deleteUser(${user.id})">Hapus</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function loadClassesTable(classes) {
+      const tbody = document.getElementById('classTableBody');
+      if (!classes || classes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = classes.map(cls => `
+        <tr>
+          <td>${cls.name}</td>
+          <td>Kelas ${cls.grade}</td>
+          <td>${cls.department_name || '-'}</td>
+          <td>${cls.homeroom_teacher || '-'}</td>
+          <td>
+            <a href="javascript:editClass(${cls.id})">Edit</a>
+            <a href="javascript:deleteClass(${cls.id})">Hapus</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function loadRecentJournals(journals) {
+      const tbody = document.getElementById('recentJournalBody');
+      if (!journals || journals.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = journals.map(journal => `
+        <tr>
+          <td>${formatDate(new Date(journal.date))}</td>
+          <td>${journal.class_name || '-'}</td>
+          <td>${journal.kd_description || '-'}</td>
+          <td>${journal.is_verified ? '<span class="badge badge-success">Terverifikasi</span>' : '<span class="badge badge-warning">Pending</span>'}</td>
+          <td>
+            <a href="javascript:viewJournal(${journal.id})">Lihat</a>
+            <a href="javascript:editJournal(${journal.id})">Edit</a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function loadAttendanceHistory(attendance) {
+      const tbody = document.getElementById('attendanceHistoryBody');
+      if (!attendance || attendance.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+        return;
+      }
+
+      const statusMap = {
+        'hadir': 'Hadir',
+        'sakit': 'Sakit',
+        'izin': 'Izin',
+        'alfa': 'Alfa'
+      };
+
+      const statusBadgeMap = {
+        'hadir': 'badge-success',
+        'sakit': 'badge-warning',
+        'izin': 'badge-info',
+        'alfa': 'badge-danger'
+      };
+
+      tbody.innerHTML = attendance.map(att => `
+        <tr>
+          <td>${formatDate(new Date(att.date))}</td>
+          <td>${att.class_name || '-'}</td>
+          <td><span class="badge ${statusBadgeMap[att.status] || 'badge-primary'}">${statusMap[att.status] || att.status}</span></td>
+          <td>${att.notes || '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Modal functions
+    function showAddUserModal() {
+      document.getElementById('addUserModal').classList.add('show');
+    }
+
+    function showAddClassModal() {
+      document.getElementById('addClassModal').classList.add('show');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    async function handleAddUser(event) {
+      event.preventDefault();
+      // Implement add user logic
+      showToast('Fitur ini akan diimplementasikan di fase selanjutnya', 'info');
+    }
+
+    async function handleAddClass(event) {
+      event.preventDefault();
+      // Implement add class logic
+      showToast('Fitur ini akan diimplementasikan di fase selanjutnya', 'info');
+    }
+
+    function logout() {
+      api.logout();
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      showToast('Logout berhasil', 'success');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 500);
+    }
+
+    function goToJournal() {
+      window.location.href = 'journal.html';
+    }
+
+    function goToAttendance() {
+      window.location.href = 'attendance.html';
+    }
+
+    // Placeholder functions for future implementation
+    function editUser(userId) {
+      showToast('Edit user belum diimplementasikan', 'info');
+    }
+
+    function deleteUser(userId) {
+      showToast('Delete user belum diimplementasikan', 'info');
+    }
+
+    function editClass(classId) {
+      showToast('Edit kelas belum diimplementasikan', 'info');
+    }
+
+    function deleteClass(classId) {
+      showToast('Delete kelas belum diimplementasikan', 'info');
+    }
+
+    function viewJournal(journalId) {
+      showToast('View journal belum diimplementasikan', 'info');
+    }
+
+    function editJournal(journalId) {
+      showToast('Edit journal belum diimplementasikan', 'info');
+    }
+  </script>
+</body>
+
+</html>

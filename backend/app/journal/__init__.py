@@ -1,0 +1,1 @@
+"""Initialize journal module"""

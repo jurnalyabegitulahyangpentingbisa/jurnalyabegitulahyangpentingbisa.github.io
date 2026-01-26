@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Absensi - Jurnal Mengajar & Absensi Siswa</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .attendance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .attendance-item {
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background-color: white;
+    }
+
+    .attendance-item:hover {
+      border-color: #2196F3;
+      transform: scale(1.02);
+    }
+
+    .attendance-item.hadir {
+      background-color: #E8F5E9;
+      border-color: #4CAF50;
+    }
+
+    .attendance-item.sakit {
+      background-color: #FFF3E0;
+      border-color: #FF9800;
+    }
+
+    .attendance-item.izin {
+      background-color: #E3F2FD;
+      border-color: #2196F3;
+    }
+
+    .attendance-item.alfa {
+      background-color: #FFEBEE;
+      border-color: #f44336;
+    }
+
+    .attendance-item.tidak_diisi {
+      background-color: #f5f5f5;
+      border-color: #ccc;
+    }
+
+    .attendance-item-date {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .attendance-item-status {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .summary-box {
+      background-color: white;
+      padding: 16px;
+      border-radius: 4px;
+      margin: 12px 0;
+      border-left: 4px solid #2196F3;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .summary-item {
+      padding: 12px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .summary-label {
+      font-size: 12px;
+      color: #999;
+      text-transform: uppercase;
+    }
+
+    .summary-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">Jurnal Mengajar & Absensi</div>
+    <ul class="navbar-menu">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="journal.html" id="journalLink" class="hidden">Jurnal Mengajar</a></li>
+      <li><a href="attendance.html">Absensi</a></li>
+      <li><a href="settings.html">Pengaturan</a></li>
+    </ul>
+    <div class="user-menu">
+      <span id="userDisplay"></span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Teacher View: Record Attendance -->
+    <div id="teacherView" class="hidden">
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>Pencatatan Absensi</h2>
+          <button class="btn btn-primary" onclick="showBulkAttendanceModal()">Catat Massal</button>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="classSelect">Kelas</label>
+              <select id="classSelect" onchange="loadClassStudents()" required>
+                <option value="">-- Pilih Kelas --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="attendanceDate">Tanggal</label>
+              <input type="date" id="attendanceDate" onchange="loadClassStudents()">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Attendance List -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Daftar Siswa</h2>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>NIS</th>
+                  <th>Nama Siswa</th>
+                  <th>Status</th>
+                  <th>Keterangan</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="studentListBody">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 20px;">Pilih kelas terlebih dahulu</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card-footer" style="margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" onclick="goToDashboard()">Kembali</button>
+            <button type="button" class="btn btn-primary" onclick="saveAttendance()">Simpan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student View: Attendance History -->
+    <div id="studentView" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>Riwayat Absensi Saya</h2>
+        </div>
+        <div class="card-body">
+          <div class="summary-box">
+            <strong>Ringkasan Kehadiran Bulan Ini</strong>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <div class="summary-label">Hadir</div>
+                <div class="summary-value" style="color: #4CAF50;" id="studentPresent">-</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Sakit</div>
+                <div class="summary-value" style="color: #FF9800;" id="studentSick">-</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Izin</div>
+                <div class="summary-value" style="color: #2196F3;" id="studentPermit">-</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Alfa</div>
+                <div class="summary-value" style="color: #f44336;" id="studentAbsent">-</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">Persentase</div>
+                <div class="summary-value" style="color: #2196F3;" id="studentPercentage">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Calendar -->
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>Kalender Kehadiran</h2>
+          <div>
+            <button class="btn btn-secondary btn-small" onclick="previousMonth()">&lt;</button>
+            <span id="monthDisplay" style="margin: 0 10px;"></span>
+            <button class="btn btn-secondary btn-small" onclick="nextMonth()">&gt;</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="attendance-grid" id="attendanceCalendar">
+            <!-- Calendar will be generated here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Details -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Riwayat Absensi Detail</h2>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Kelas</th>
+                  <th>Status</th>
+                  <th>Keterangan</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceHistoryBody">
+                <tr>
+                  <td colspan="4" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Permission Request -->
+      <div class="card">
+        <div class="card-header flex-between">
+          <h2>Pengajuan Izin</h2>
+          <button class="btn btn-primary" onclick="showPermitModal()">+ Ajukan Izin</button>
+        </div>
+        <div class="card-body">
+          <div style="overflow-x: auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Tanggal Mulai</th>
+                  <th>Tanggal Akhir</th>
+                  <th>Alasan</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="permitsTableBody">
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 20px;">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Attendance Modal -->
+  <div id="bulkAttendanceModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Catat Absensi Massal</h2>
+        <button class="close" onclick="closeModal('bulkAttendanceModal')">&times;</button>
+      </div>
+      <form id="bulkAttendanceForm" onsubmit="handleBulkAttendance(event)">
+        <div class="form-group">
+          <label for="bulkClass">Kelas</label>
+          <select id="bulkClass" required>
+            <option value="">-- Pilih Kelas --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="bulkDate">Tanggal</label>
+          <input type="date" id="bulkDate" required>
+        </div>
+
+        <div class="form-group">
+          <label>Pilih Status untuk Semua</label>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin: 10px 0;">
+            <button type="button" class="btn btn-success" onclick="setBulkStatus('hadir')">Semua Hadir</button>
+            <button type="button" class="btn btn-warning" onclick="setBulkStatus('sakit')">Semua Sakit</button>
+            <button type="button" class="btn btn-info" onclick="setBulkStatus('izin')">Semua Izin</button>
+            <button type="button" class="btn btn-danger" onclick="setBulkStatus('alfa')">Semua Alfa</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Status Individual Siswa</label>
+          <div id="bulkStudentsList" style="max-height: 400px; overflow-y: auto;"></div>
+        </div>
+
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('bulkAttendanceModal')">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Permit Modal -->
+  <div id="permitModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Pengajuan Izin Absensi</h2>
+        <button class="close" onclick="closeModal('permitModal')">&times;</button>
+      </div>
+      <form id="permitForm" onsubmit="handleSubmitPermit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="permitStart">Tanggal Mulai</label>
+            <input type="date" id="permitStart" required>
+          </div>
+          <div class="form-group">
+            <label for="permitEnd">Tanggal Akhir</label>
+            <input type="date" id="permitEnd" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="permitType">Jenis Izin</label>
+          <select id="permitType" required>
+            <option value="">-- Pilih Jenis Izin --</option>
+            <option value="sakit">Sakit</option>
+            <option value="keluarga">Keperluan Keluarga</option>
+            <option value="acara">Acara/Event</option>
+            <option value="lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="permitReason">Alasan</label>
+          <textarea id="permitReason" placeholder="Jelaskan alasan izin Anda" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="permitDocument">Dokumen Pendukung (opsional)</label>
+          <input type="file" id="permitDocument" accept="image/*,.pdf">
+          <small style="color: #999;">Format: JPG, PNG, atau PDF (Max 2MB)</small>
+        </div>
+
+        <div class="card-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('permitModal')">Batal</button>
+          <button type="submit" class="btn btn-primary">Ajukan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    let currentUser = null;
+    let currentMonth = new Date();
+    let attendanceData = {};
+
+    window.addEventListener('DOMContentLoaded', async function() {
+      requireLogin();
+
+      currentUser = getLoggedInUser();
+      document.getElementById('userDisplay').textContent = currentUser.full_name || currentUser.email;
+
+      // Show appropriate view based on role
+      if (currentUser.role === 'Guru' || currentUser.role === 'Admin') {
+        document.getElementById('teacherView').classList.remove('hidden');
+        document.getElementById('journalLink').classList.remove('hidden');
+        await loadTeacherClasses();
+      } else if (currentUser.role === 'Siswa') {
+        document.getElementById('studentView').classList.remove('hidden');
+        await loadStudentAttendance();
+        displayCalendar();
+      }
+    });
+
+    // ===== TEACHER FUNCTIONS =====
+    async function loadTeacherClasses() {
+      try {
+        const classes = await api.getClasses();
+        const select = document.getElementById('classSelect');
+        const bulkSelect = document.getElementById('bulkClass');
+
+        if (classes && Array.isArray(classes)) {
+          const html = classes.map(cls => 
+            `<option value="${cls.id}">${cls.name} (Kelas ${cls.grade})</option>`
+          ).join('');
+          select.innerHTML = '<option value="">-- Pilih Kelas --</option>' + html;
+          bulkSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>' + html;
+        }
+      } catch (error) {
+        console.error('Error loading classes:', error);
+      }
+    }
+
+    async function loadClassStudents() {
+      const classId = document.getElementById('classSelect').value;
+      const date = document.getElementById('attendanceDate').value;
+
+      if (!classId) {
+        document.getElementById('studentListBody').innerHTML = 
+          '<tr><td colspan="6" style="text-align: center; padding: 20px;">Pilih kelas terlebih dahulu</td></tr>';
+        return;
+      }
+
+      try {
+        const students = await api.getClassStudents(classId);
+        loadStudentTable(students, classId, date);
+      } catch (error) {
+        console.error('Error loading students:', error);
+        showToast('Gagal memuat daftar siswa', 'danger');
+      }
+    }
+
+    function loadStudentTable(students, classId, date) {
+      const tbody = document.getElementById('studentListBody');
+
+      if (!students || students.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px;">Tidak ada siswa di kelas ini</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = students.map((student, index) => `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${student.nis || '-'}</td>
+          <td>${student.full_name || '-'}</td>
+          <td>
+            <select class="attendance-status" data-student-id="${student.id}">
+              <option value="">-- Pilih --</option>
+              <option value="hadir">Hadir</option>
+              <option value="sakit">Sakit</option>
+              <option value="izin">Izin</option>
+              <option value="alfa">Alfa</option>
+            </select>
+          </td>
+          <td>
+            <input type="text" class="attendance-notes" data-student-id="${student.id}" placeholder="Catatan">
+          </td>
+          <td>
+            <button type="button" class="btn btn-small btn-secondary" onclick="clearAttendance(${student.id})">Hapus</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function saveAttendance() {
+      const classId = document.getElementById('classSelect').value;
+      const date = document.getElementById('attendanceDate').value;
+
+      if (!classId || !date) {
+        showToast('Pilih kelas dan tanggal terlebih dahulu', 'warning');
+        return;
+      }
+
+      const records = [];
+      document.querySelectorAll('.attendance-status').forEach(select => {
+        const status = select.value;
+        if (status) {
+          const studentId = select.dataset.studentId;
+          const notes = document.querySelector(`.attendance-notes[data-student-id="${studentId}"]`).value;
+          records.push({
+            student_id: studentId,
+            class_id: classId,
+            date: date,
+            status: status,
+            notes: notes || null
+          });
+        }
+      });
+
+      if (records.length === 0) {
+        showToast('Tidak ada data absensi yang diisi', 'warning');
+        return;
+      }
+
+      try {
+        await api.bulkRecordAttendance(classId, date, records);
+        showToast('Absensi berhasil disimpan', 'success');
+        loadClassStudents();
+      } catch (error) {
+        console.error('Error saving attendance:', error);
+        showToast('Gagal menyimpan absensi: ' + (error.message || 'Unknown error'), 'danger');
+      }
+    }
+
+    function clearAttendance(studentId) {
+      const select = document.querySelector(`.attendance-status[data-student-id="${studentId}"]`);
+      const notes = document.querySelector(`.attendance-notes[data-student-id="${studentId}"]`);
+      select.value = '';
+      notes.value = '';
+    }
+
+    function showBulkAttendanceModal() {
+      const classId = document.getElementById('classSelect').value;
+      if (!classId) {
+        showToast('Pilih kelas terlebih dahulu', 'warning');
+        return;
+      }
+
+      document.getElementById('bulkClass').value = classId;
+      document.getElementById('bulkDate').value = document.getElementById('attendanceDate').value;
+      loadBulkStudentsList();
+      document.getElementById('bulkAttendanceModal').classList.add('show');
+    }
+
+    async function loadBulkStudentsList() {
+      const classId = document.getElementById('bulkClass').value;
+      try {
+        const students = await api.getClassStudents(classId);
+        const container = document.getElementById('bulkStudentsList');
+
+        if (!students || students.length === 0) {
+          container.innerHTML = '<p>Tidak ada siswa di kelas ini</p>';
+          return;
+        }
+
+        container.innerHTML = students.map(student => `
+          <div style="padding: 8px; border-bottom: 1px solid #eee;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>${student.full_name || '-'}</span>
+              <select class="bulk-status" data-student-id="${student.id}">
+                <option value="">-- Pilih --</option>
+                <option value="hadir">Hadir</option>
+                <option value="sakit">Sakit</option>
+                <option value="izin">Izin</option>
+                <option value="alfa">Alfa</option>
+              </select>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading bulk students:', error);
+      }
+    }
+
+    function setBulkStatus(status) {
+      document.querySelectorAll('.bulk-status').forEach(select => {
+        select.value = status;
+      });
+    }
+
+    async function handleBulkAttendance(event) {
+      event.preventDefault();
+
+      const classId = document.getElementById('bulkClass').value;
+      const date = document.getElementById('bulkDate').value;
+
+      const records = [];
+      document.querySelectorAll('.bulk-status').forEach(select => {
+        const status = select.value;
+        if (status) {
+          const studentId = select.dataset.studentId;
+          records.push({
+            student_id: studentId,
+            class_id: classId,
+            date: date,
+            status: status,
+            notes: null
+          });
+        }
+      });
+
+      try {
+        await api.bulkRecordAttendance(classId, date, records);
+        showToast('Absensi massal berhasil disimpan', 'success');
+        closeModal('bulkAttendanceModal');
+        loadClassStudents();
+      } catch (error) {
+        console.error('Error saving bulk attendance:', error);
+        showToast('Gagal menyimpan absensi massal', 'danger');
+      }
+    }
+
+    function goToDashboard() {
+      window.location.href = 'dashboard.html';
+    }
+
+    // ===== STUDENT FUNCTIONS =====
+    async function loadStudentAttendance() {
+      try {
+        const dashboard = await api.getStudentDashboard();
+
+        document.getElementById('studentPresent').textContent = dashboard.present_days || 0;
+        document.getElementById('studentSick').textContent = dashboard.sick_days || 0;
+        document.getElementById('studentPermit').textContent = dashboard.permit_days || 0;
+        document.getElementById('studentAbsent').textContent = dashboard.absent_days || 0;
+        document.getElementById('studentPercentage').textContent = (dashboard.attendance_percentage || 0).toFixed(1) + '%';
+
+        // Load attendance history
+        const history = await api.getStudentAttendanceHistory();
+        loadAttendanceHistory(history);
+
+        // Load permits
+        const permits = await api.getStudentPermits();
+        loadPermitsTable(permits);
+      } catch (error) {
+        console.error('Error loading student attendance:', error);
+        showToast('Gagal memuat data absensi', 'danger');
+      }
+    }
+
+    function loadAttendanceHistory(attendance) {
+      const tbody = document.getElementById('attendanceHistoryBody');
+
+      if (!attendance || attendance.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+        return;
+      }
+
+      const statusMap = {
+        'hadir': 'Hadir',
+        'sakit': 'Sakit',
+        'izin': 'Izin',
+        'alfa': 'Alfa'
+      };
+
+      const statusBadgeMap = {
+        'hadir': 'badge-success',
+        'sakit': 'badge-warning',
+        'izin': 'badge-info',
+        'alfa': 'badge-danger'
+      };
+
+      tbody.innerHTML = attendance.map(att => `
+        <tr>
+          <td>${formatDate(new Date(att.date))}</td>
+          <td>${att.class_name || '-'}</td>
+          <td><span class="badge ${statusBadgeMap[att.status] || 'badge-primary'}">${statusMap[att.status] || att.status}</span></td>
+          <td>${att.notes || '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function loadPermitsTable(permits) {
+      const tbody = document.getElementById('permitsTableBody');
+
+      if (!permits || permits.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">Tidak ada pengajuan izin</td></tr>';
+        return;
+      }
+
+      const statusMap = {
+        'pending': 'Pending',
+        'approved': 'Disetujui',
+        'rejected': 'Ditolak'
+      };
+
+      const statusBadgeMap = {
+        'pending': 'badge-warning',
+        'approved': 'badge-success',
+        'rejected': 'badge-danger'
+      };
+
+      tbody.innerHTML = permits.map(permit => `
+        <tr>
+          <td>${formatDate(new Date(permit.start_date))}</td>
+          <td>${formatDate(new Date(permit.end_date))}</td>
+          <td>${permit.reason}</td>
+          <td><span class="badge ${statusBadgeMap[permit.status]}">${statusMap[permit.status]}</span></td>
+          <td>
+            ${permit.status === 'pending' ? `<a href="javascript:cancelPermit(${permit.id})">Batalkan</a>` : '-'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function displayCalendar() {
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth();
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+
+      document.getElementById('monthDisplay').textContent = 
+        currentMonth.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+
+      const calendar = document.getElementById('attendanceCalendar');
+      let html = '';
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const dateStr = formatDateForInput(date);
+        const status = attendanceData[dateStr] || 'tidak_diisi';
+        const statusLabel = {
+          'hadir': 'Hadir',
+          'sakit': 'Sakit',
+          'izin': 'Izin',
+          'alfa': 'Alfa',
+          'tidak_diisi': 'Belum Diisi'
+        };
+
+        html += `
+          <div class="attendance-item ${status}">
+            <div class="attendance-item-date">${day}</div>
+            <div class="attendance-item-status">${statusLabel[status]}</div>
+          </div>
+        `;
+      }
+
+      calendar.innerHTML = html;
+    }
+
+    function previousMonth() {
+      currentMonth.setMonth(currentMonth.getMonth() - 1);
+      displayCalendar();
+    }
+
+    function nextMonth() {
+      currentMonth.setMonth(currentMonth.getMonth() + 1);
+      displayCalendar();
+    }
+
+    function showPermitModal() {
+      // Set default dates
+      const today = new Date();
+      document.getElementById('permitStart').value = formatDateForInput(today);
+      document.getElementById('permitEnd').value = formatDateForInput(today);
+      document.getElementById('permitModal').classList.add('show');
+    }
+
+    async function handleSubmitPermit(event) {
+      event.preventDefault();
+
+      const permitData = {
+        start_date: document.getElementById('permitStart').value,
+        end_date: document.getElementById('permitEnd').value,
+        permit_type: document.getElementById('permitType').value,
+        reason: document.getElementById('permitReason').value
+      };
+
+      try {
+        await api.submitPermit(permitData);
+        showToast('Pengajuan izin berhasil dikirim', 'success');
+        closeModal('permitModal');
+        await loadStudentAttendance();
+      } catch (error) {
+        console.error('Error submitting permit:', error);
+        showToast('Gagal mengajukan izin', 'danger');
+      }
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('show');
+    }
+
+    function cancelPermit(permitId) {
+      if (confirm('Apakah Anda yakin ingin membatalkan izin ini?')) {
+        showToast('Fitur pembatalan izin belum diimplementasikan', 'info');
+      }
+    }
+
+    function logout() {
+      api.logout();
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      showToast('Logout berhasil', 'success');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 500);
+    }
+  </script>
+</body>
+
+</html>

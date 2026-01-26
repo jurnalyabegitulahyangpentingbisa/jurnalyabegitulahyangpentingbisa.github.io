@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Jurnal Mengajar & Absensi Siswa</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #2196F3 0%, #FF9800 100%);
+    }
+
+    .login-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+      padding: 40px;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .login-header h1 {
+      color: #2196F3;
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .login-header p {
+      color: #999;
+      margin: 8px 0 0 0;
+      font-size: 14px;
+    }
+
+    .login-school {
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid #f5f5f5;
+    }
+
+    .login-school h3 {
+      color: #333;
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .login-school p {
+      color: #999;
+      margin: 4px 0 0 0;
+      font-size: 13px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .login-form button {
+      background-color: #2196F3;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.3s;
+      margin-top: 8px;
+    }
+
+    .login-form button:hover {
+      background-color: #1976D2;
+    }
+
+    .login-form button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #f5f5f5;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .error-message {
+      display: none;
+      background-color: #FFEBEE;
+      color: #f44336;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      border-left: 4px solid #f44336;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: #2196F3;
+      margin-top: 16px;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #2196F3;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .demo-credentials {
+      background-color: #E3F2FD;
+      border-left: 4px solid #2196F3;
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #1565C0;
+    }
+
+    .demo-credentials strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .demo-cred-row {
+      margin: 6px 0;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>Jurnal Mengajar</h1>
+        <p>&amp; Absensi Siswa</p>
+      </div>
+
+      <div class="login-school">
+        <h3>SMK Negeri 1 Lemahabang</h3>
+        <p>Teknik Komputer & Jaringan</p>
+      </div>
+
+      <div class="demo-credentials" id="demoCredentials">
+        <strong>🔧 Demo Credentials:</strong>
+        <div class="demo-cred-row"><strong>Admin:</strong> admin@smk.ac.id / admin123456</div>
+        <div class="demo-cred-row"><strong>Guru:</strong> guru1@smk.ac.id / guru123456</div>
+        <div class="demo-cred-row"><strong>Siswa:</strong> siswa1@smk.ac.id / siswa123456</div>
+      </div>
+
+      <div class="error-message" id="errorMessage"></div>
+
+      <form class="login-form" id="loginForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Masukkan email Anda" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Masukkan password Anda" required>
+        </div>
+
+        <button type="submit" id="loginButton">Login</button>
+
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Sedang memproses...</p>
+        </div>
+      </form>
+
+      <div class="login-footer">
+        <p>Kontak IT: <strong>it@smk.ac.id</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    // Check if already logged in
+    window.addEventListener('DOMContentLoaded', function() {
+      if (isLoggedIn()) {
+        const user = getLoggedInUser();
+        window.location.href = `dashboard.html?role=${user.role}`;
+      }
+
+      // Hide demo credentials in production
+      const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      if (!isDevelopment) {
+        document.getElementById('demoCredentials').style.display = 'none';
+      }
+    });
+
+    // Handle login form submission
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('errorMessage');
+      const loginBtn = document.getElementById('loginButton');
+      const loading = document.getElementById('loading');
+
+      // Reset error message
+      errorDiv.classList.remove('show');
+      errorDiv.textContent = '';
+
+      // Disable button and show loading
+      loginBtn.disabled = true;
+      loading.style.display = 'block';
+
+      try {
+        const response = await api.login(email, password);
+
+        if (response.access_token && response.user) {
+          // Store token and user info
+          localStorage.setItem('token', response.access_token);
+          localStorage.setItem('user', JSON.stringify(response.user));
+
+          showToast('Login berhasil!', 'success');
+
+          // Redirect to appropriate dashboard
+          setTimeout(() => {
+            window.location.href = `dashboard.html?role=${response.user.role}`;
+          }, 500);
+        } else {
+          throw new Error('Response tidak valid');
+        }
+      } catch (error) {
+        errorDiv.classList.add('show');
+        errorDiv.textContent = error.message || 'Email atau password salah. Silakan coba lagi.';
+        console.error('Login error:', error);
+      } finally {
+        loginBtn.disabled = false;
+        loading.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+
+</html>

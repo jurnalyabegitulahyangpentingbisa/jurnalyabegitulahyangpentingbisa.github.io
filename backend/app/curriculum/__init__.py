@@ -1,0 +1,1 @@
+"""Initialize curriculum module"""
