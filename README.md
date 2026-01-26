@@ -1,0 +1,2 @@
+# jurnalyabegitulahyangpentingbisa.github.io
+yes
