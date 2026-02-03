@@ -212,9 +212,11 @@
         window.location.href = `dashboard.html?role=${user.role}`;
       }
 
-      // Hide demo credentials in production
-      const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-      if (!isDevelopment) {
+      // Show demo credentials when running in demo mode (GitHub Pages)
+      try {
+        const showDemo = (typeof api !== 'undefined' && api.demo) || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        if (!showDemo) document.getElementById('demoCredentials').style.display = 'none';
+      } catch (e) {
         document.getElementById('demoCredentials').style.display = 'none';
       }
     });

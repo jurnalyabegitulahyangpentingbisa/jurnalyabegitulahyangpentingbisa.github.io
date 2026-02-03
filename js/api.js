@@ -6,7 +6,8 @@
 class APIClient {
   constructor(baseURL = 'http://localhost:8000/api') {
     this.baseURL = baseURL;
-    this.token = localStorage.getItem('access_token');
+    // support both 'token' and 'access_token' keys (some pages use one or the other)
+    this.token = localStorage.getItem('token') || localStorage.getItem('access_token');
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
     // Demo mode for GitHub Pages / static hosting
     this.demo = location.hostname.includes('github.io') || location.protocol === 'file:';
@@ -98,6 +99,7 @@ class APIClient {
    */
   logout() {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.token = null;
     this.user = {};

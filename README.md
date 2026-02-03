@@ -1,467 +1,394 @@
-# 📚 Journal Mengajar Online & Absensi Siswa
-## SMK Negeri 1 Lemahabang - Teknik Komputer dan Jaringan
+# Frontend - Jurnal Mengajar & Absensi Siswa
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.104.1-green)
-![Oracle](https://img.shields.io/badge/Oracle-19c+-red)
-![Status](https://img.shields.io/badge/Status-Development-yellow)
+Frontend aplikasi Jurnal Mengajar & Absensi Siswa yang dibangun dengan vanilla HTML, CSS, dan JavaScript. Fully compatible dengan GitHub Pages untuk static hosting.
 
----
-
-## 📋 Daftar Isi
-
-- [Deskripsi Proyek](#deskripsi-proyek)
-- [Fitur Utama](#fitur-utama)
-- [Tech Stack](#tech-stack)
-- [Struktur Proyek](#struktur-proyek)
-- [Quick Start](#quick-start)
-- [Dokumentasi](#dokumentasi)
-- [Setup Database](#setup-database)
-- [API Endpoints](#api-endpoints)
-- [Panduan Kontribusi](#panduan-kontribusi)
-
----
-
-## 📌 Deskripsi Proyek
-
-Aplikasi **Journal Mengajar Online & Absensi Siswa** adalah sistem manajemen terpadu untuk:
-
-- 📝 **Guru**: Mencatat jurnal mengajar harian dengan detail KI/KD, ATP, dan modul pembelajaran
-- 📊 **Admin**: Mengelola data kurikulum, verifikasi journal, dan monitoring absensi
-- 👥 **Siswa**: Melihat absensi, mengajukan surat izin, dan akses informasi pembelajaran
-- 🏫 **Kepala Sekolah**: Dashboard ringkasan dan approval verifikasi
-
-**Tingkat**: Kelas 10, 11, dan 12  
-**Departemen**: Teknik Komputer dan Jaringan  
-**Institusi**: SMK Negeri 1 Lemahabang
-
----
-
-## ✨ Fitur Utama
-
-### 🔐 Manajemen Pengguna
-- ✅ Registrasi & Login dengan JWT
-- ✅ Role-based access control (Admin, Guru, Siswa, Kepala Sekolah)
-- ✅ Profile management
-- ✅ Password hashing dengan bcrypt
-
-### 📖 Journal Mengajar
-- ✅ Buat/edit/hapus journal mengajar harian
-- ✅ Integrase dengan KI/KD (Kurikulum 2013)
-- ✅ Integrase dengan ATP/Modul (Kurikulum Merdeka)
-- ✅ Catat metode pembelajaran, kegiatan, dan pencapaian
-- ✅ Lampirkan file dan catatan
-- ✅ Submit dan verifikasi journal
-- ✅ Filter dan laporan berdasarkan tanggal
-
-### 📋 Absensi Siswa
-- ✅ Catat absensi per siswa atau massal
-- ✅ Status: Hadir, Sakit, Izin, Alfa, Libur
-- ✅ Sistem permohonan surat izin dengan approval flow
-- ✅ Summary absensi per bulan
-- ✅ Laporan attendance rate dan statistik
-
-### 📚 Manajemen Kurikulum
-- ✅ **KI/KD** (Kompetensi Inti & Dasar) - Kurikulum 2013
-- ✅ **ATP** (Alur Tujuan Pembelajaran) - Kurikulum Merdeka
-- ✅ **Modul Pembelajaran** - Structured learning modules
-- ✅ **Pembelajaran Mendalam** - Deep learning programs dengan 3 fase
-- ✅ Dukungan semua tingkat kelas (10, 11, 12)
-
-### 📊 Dashboard
-- ✅ **Dashboard Admin**: Statistik sistem, monitoring, user management
-- ✅ **Dashboard Guru**: Ringkasan journal, data mengajar, kelas yang dibimbing
-- ✅ **Dashboard Siswa**: Absensi pribadi, permohonan izin, informasi pembelajaran
-- ✅ Real-time data aggregation
-
----
-
-## 🛠️ Tech Stack
-
-| Komponen | Teknologi | Alasan |
-|----------|-----------|--------|
-| **Backend** | Python FastAPI | Performa tinggi, async, dokumentasi otomatis |
-| **Database** | Oracle 19c/21c | Skalabilitas, keandalan enterprise, multi-user |
-| **ORM** | SQLAlchemy 2.0 | Flexible, support Oracle, production-ready |
-| **Authentication** | JWT + bcrypt | Stateless, scalable, aman |
-| **API Docs** | OpenAPI/Swagger | Dokumentasi interaktif otomatis |
-| **Server** | Uvicorn | High-performance ASGI server |
-
----
-
-## 📁 Struktur Proyek
+## 📁 Struktur Direktori
 
 ```
-jurnalyabegitulahyangpentingbisa.github.io/
-│
-├── backend/                          # Backend Python FastAPI
-│   ├── app/
-│   │   ├── auth/                    # Authentication & User Management
-│   │   │   ├── models.py
-│   │   │   ├── schemas.py
-│   │   │   ├── crud.py
-│   │   │   └── routes.py
-│   │   ├── journal/                 # Journal Mengajar
-│   │   │   ├── models.py
-│   │   │   ├── schemas.py
-│   │   │   ├── crud.py
-│   │   │   └── routes.py
-│   │   ├── attendance/              # Absensi Siswa
-│   │   │   ├── models.py
-│   │   │   ├── schemas.py
-│   │   │   ├── crud.py
-│   │   │   └── routes.py
-│   │   ├── curriculum/              # KI/KD, ATP, Modul, Deep Learning
-│   │   │   ├── models.py
-│   │   │   ├── schemas.py
-│   │   │   ├── crud.py
-│   │   │   └── routes.py
-│   │   ├── dashboard/               # Dashboard Endpoints
-│   │   │   ├── routes.py
-│   │   │   └── schemas.py
-│   │   ├── core/                    # Core Configuration
-│   │   │   ├── config.py
-│   │   │   ├── database.py
-│   │   │   └── security.py
-│   │   └── main.py                  # Application Entry Point
-│   ├── scripts/
-│   │   ├── init_database.py         # Database Setup
-│   │   └── seed_data.py             # Initial Data
-│   ├── tests/                        # Unit & Integration Tests
-│   ├── requirements.txt              # Python Dependencies
-│   ├── .env.example                 # Environment Template
-│   ├── run.py                       # Application Runner
-│   └── README.md                    # Backend Documentation
-│
-├── frontend/                         # Frontend (Frontend - TODO)
-│   ├── index.html
-│   ├── dashboard-admin.html
-│   ├── dashboard-guru.html
-│   ├── dashboard-siswa.html
-│   ├── css/
-│   ├── js/
-│   └── assets/
-│
-├── docs/                            # Dokumentasi
-│   ├── DATABASE_DESIGN.md           # Database Schema & ERD
-│   ├── API_DOCUMENTATION.md         # API Reference
-│   ├── USER_GUIDE.md                # Panduan Pengguna
-│   └── SETUP_GUIDE.md               # Panduan Setup
-│
-├── PANDUAN_SETUP.md                # Panduan Setup Lengkap
-├── README.md                        # File ini
-└── .gitignore
+frontend/
+├── index.html              # Halaman login (entry point)
+├── dashboard.html          # Dashboard utama (Admin/Guru/Siswa)
+├── journal.html            # Halaman jurnal mengajar (Guru)
+├── attendance.html         # Halaman absensi (Guru & Siswa)
+├── admin.html              # Admin panel (Admin saja)
+├── settings.html           # Pengaturan profil pengguna
+├── css/
+│   └── styles.css          # Styling global dan responsive
+├── js/
+│   ├── api.js              # API client abstraction layer
+│   └── utils.js            # Utility functions & helpers
+└── assets/                 # Images, icons, dll
 ```
-
----
 
 ## 🚀 Quick Start
 
-### Prasyarat
-- Python 3.8+
-- Oracle Database 19c atau 21c
-- Git
-- Virtual Environment
-
-### 1. Clone Repository
-```bash
-git clone <repository-url>
-cd jurnalyabegitulahyangpentingbisa.github.io
-```
-
-### 2. Setup Backend
+### 1. Setup Lokal (Development)
 
 ```bash
-cd backend
+# Clone repository
+git clone https://github.com/jurnalyabegitulahyangpentingbisa.github.io.git
+cd frontend
 
-# Buat virtual environment
-python3 -m venv venv
-source venv/bin/activate  # Linux/macOS
-# atau untuk Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Copy environment template
-cp .env.example .env
-
-# Edit .env dengan konfigurasi Oracle Anda
-nano .env
-```
-
-### 3. Inisialisasi Database
-
-```bash
-# Buat semua tables
-python scripts/init_database.py
-
-# (Optional) Insert data awal
-python scripts/seed_data.py
-```
-
-### 4. Jalankan Server
-
-```bash
-python run.py
+# Buka di browser (local server diperlukan)
+# Jangan buka file:// langsung karena localStorage limited
+python -m http.server 8080
 # atau
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+npx http-server
+
+# Akses: http://localhost:8080
 ```
 
-Server akan berjalan di: **http://localhost:8000**
-
----
-
-## 📚 Dokumentasi
-
-| Dokumen | Deskripsi |
-|---------|-----------|
-| [PANDUAN_SETUP.md](PANDUAN_SETUP.md) | Panduan lengkap setup aplikasi |
-| [backend/README.md](backend/README.md) | Dokumentasi backend |
-| [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md) | Database schema dan ERD |
-| [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) | API endpoints reference |
-| [docs/USER_GUIDE.md](docs/USER_GUIDE.md) | Panduan pengguna aplikasi |
-
----
-
-## 🗄️ Setup Database
-
-### Koneksi Oracle
-
-Edit file `backend/.env`:
-
-```env
-ORACLE_USER=smk_admin
-ORACLE_PASSWORD=your_password
-ORACLE_HOST=localhost
-ORACLE_PORT=1521
-ORACLE_SID=XE
-ORACLE_CHARSET=UTF8
-```
-
-### Inisialisasi Tabel
+### 2. Deploy ke GitHub Pages
 
 ```bash
-cd backend
-python scripts/init_database.py
+# Pastikan file berada di root repository (atau /docs folder)
+git add frontend/*
+git commit -m "Add frontend"
+git push origin main
+
+# GitHub Pages akan serve dari: https://username.github.io/
 ```
 
-### Data Awal (Optional)
+### 3. Backend Configuration
 
-```bash
-python scripts/seed_data.py
+Edit `frontend/js/api.js` untuk mengubah URL backend:
+
+```javascript
+// Default: http://localhost:8000/api
+const api = new APIClient('http://your-backend-url/api');
 ```
 
-### Tabel yang Dibuat
+## 📄 File Descriptions
 
-1. **users** - Data pengguna
-2. **departments** - Departemen
-3. **classes** - Kelas/rombongan belajar
-4. **students** - Data siswa
-5. **kompetensi_inti** - KI (Kurikulum 2013)
-6. **kompetensi_dasar** - KD (Kurikulum 2013)
-7. **alur_tujuan_pembelajaran** - ATP (Kurikulum Merdeka)
-8. **teaching_modules** - Modul pembelajaran
-9. **pembelajaran_mendalam** - Program deep learning
-10. **teaching_journals** - Journal mengajar
-11. **attendance** - Absensi siswa
-12. **attendance_summary** - Ringkasan absensi
-13. **attendance_permits** - Surat izin
+### index.html - Login Page
+- Entry point aplikasi
+- Form login dengan validasi
+- Demo credentials untuk testing (development only)
+- Session management dengan localStorage
+- Redirect berdasarkan role user
 
-Lihat [docs/DATABASE_DESIGN.md](docs/DATABASE_DESIGN.md) untuk detail lengkap.
+**Demo Credentials:**
+- Admin: `admin@smk.ac.id` / `admin123456`
+- Guru: `guru1@smk.ac.id` / `guru123456`
+- Siswa: `siswa1@smk.ac.id` / `siswa123456`
 
----
+### dashboard.html - Main Dashboard
+Role-based interface:
+- **Admin**: User management, class management, statistics
+- **Guru**: Teaching statistics, recent journals, class overview
+- **Siswa**: Attendance summary, recent attendance, permit history
 
-## 🔌 API Endpoints
+### journal.html - Teaching Journal
+**Features:**
+- Create/edit/delete teaching journals
+- Filter by class, date, status
+- Pagination support
+- Comprehensive form dengan fields:
+  - Tanggal mengajar
+  - Kelas & Kompetensi Dasar
+  - Metode pembelajaran & media
+  - Kehadiran siswa & assessment
+  - Challenges & follow-up notes
 
-### Base URL
-```
-http://localhost:8000/api
-```
+### attendance.html - Attendance Management
+**Teacher View:**
+- Select class & date
+- Record attendance per student
+- Bulk attendance entry
+- Notes per student
 
-### Dokumentasi Interaktif
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+**Student View:**
+- Monthly attendance summary
+- Attendance calendar view
+- Permit request system
+- Detailed history table
 
-### Contoh Endpoints
+### admin.html - Administration Panel
+**Sections:**
+- Users management
+- Classes management
+- Curriculum management (KI/KD, ATP, Modules)
+- Attendance reports
+- Export functionality
 
-#### Authentication
-```
-POST   /auth/register          - Daftar user baru
-POST   /auth/login             - Login
-GET    /auth/me                - Get profile
-POST   /auth/change-password   - Ganti password
-```
+### settings.html - User Settings
+**Features:**
+- Profile management
+- Change password
+- Notification preferences
+- API connection status
+- Account management
 
-#### Journal Mengajar
-```
-POST   /journal                - Buat journal
-GET    /journal                - Daftar journal
-GET    /journal/{id}           - Detail journal
-PUT    /journal/{id}           - Update journal
-DELETE /journal/{id}           - Hapus journal
-POST   /journal/{id}/submit    - Submit journal
-```
+## 🛠️ API Client (api.js)
 
-#### Absensi
-```
-POST   /attendance             - Catat absensi
-POST   /attendance/bulk        - Catat absensi massal
-GET    /attendance/{student_id} - Lihat absensi siswa
-GET    /attendance/class/{class_id} - Ringkasan kelas
-POST   /attendance/permits     - Ajukan surat izin
-POST   /attendance/permits/{id}/approve - Approve izin
-```
+Fully-featured API client dengan methods untuk semua endpoints:
 
-#### Kurikulum
-```
-GET    /curriculum/ki-kd       - Daftar KI/KD
-GET    /curriculum/atp         - Daftar ATP
-GET    /curriculum/modules     - Daftar modul
-GET    /curriculum/deep-learning - Program deep learning
-```
+```javascript
+// Authentication
+api.login(email, password)
+api.logout()
+api.getProfile()
+api.updateProfile(data)
+api.changePassword(oldPassword, newPassword)
 
-#### Dashboard
-```
-GET    /dashboard/admin/summary - Dashboard admin
-GET    /dashboard/teacher/my-summary - Dashboard guru
-GET    /dashboard/student/my-summary - Dashboard siswa
-```
+// Teaching Journal
+api.createJournal(journalData)
+api.getJournals(filters)
+api.getJournal(journalId)
+api.updateJournal(journalId, data)
+api.deleteJournal(journalId)
+api.submitJournal(journalId)
+api.verifyJournal(journalId, data)
 
-Lihat [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md) untuk referensi lengkap.
+// Attendance
+api.recordAttendance(attendanceData)
+api.bulkRecordAttendance(classId, date, records)
+api.getAttendance(filters)
+api.getStudentAttendanceHistory(studentId)
+api.getAttendanceSummary(classId, month, year)
+api.submitPermit(permitData)
+api.getStudentPermits()
+api.approvePermit(permitId, notes)
+api.rejectPermit(permitId, notes)
 
----
+// Curriculum
+api.getKompetensiInti(grade)
+api.getKompetensiDasar(kiId, grade)
+api.getAturanTujuanPembelajaran(grade, fase)
+api.getTeachingModules(atpId, kdId)
+api.getPembelajaranMendalam(grade)
 
-## 🔐 Security
+// Classes & Students
+api.getClasses()
+api.getClass(classId)
+api.getClassStudents(classId)
+api.createClass(data)
+api.updateClass(classId, data)
+api.deleteClass(classId)
 
-- ✅ Password hashing dengan bcrypt
-- ✅ JWT token untuk authentication
-- ✅ Role-based access control (RBAC)
-- ✅ CORS protection
-- ✅ Input validation dengan Pydantic
-- ✅ SQL injection protection (SQLAlchemy ORM)
-
----
-
-## 📊 Default Users (Seed Data)
-
-| Email | Password | Role | Nama |
-|-------|----------|------|------|
-| admin@smk.ac.id | admin123456 | Admin | Administrator |
-| guru.tkj1@smk.ac.id | guru123456 | Guru | Budi Santoso, S.Kom. |
-| siswa.001@smk.ac.id | siswa123456 | Siswa | Ahmad Hidayat |
-
----
-
-## 🛠️ Development
-
-### Running Development Server
-```bash
-cd backend
-source venv/bin/activate
-python run.py
-```
-
-### Running Tests
-```bash
-pytest tests/
-pytest --cov=app tests/
+// Dashboards
+api.getAdminDashboard()
+api.getTeacherDashboard()
+api.getStudentDashboard()
 ```
 
-### Code Style
-```bash
-pip install black flake8
-black app/
-flake8 app/
+## 🛠️ Utility Functions (utils.js)
+
+```javascript
+// Date Formatting
+formatDate(date)           // Format ke Indonesian locale
+formatDateForInput(date)   // Format untuk HTML input
+
+// Authentication
+isLoggedIn()               // Check jika user terautentikasi
+getLoggedInUser()          // Get user object dari localStorage
+requireLogin()             // Guard function (redirect ke login)
+hasRole(role)              // Check role permission
+
+// UI Utilities
+showToast(message, type)   // Show notification (success/danger/warning/info)
+getQueryParam(param)       // Get URL query parameter
+
+// Configuration
+loadConfig()               // Load & validate backend URL
 ```
 
----
+## 🎨 Styling System
 
-## 🤝 Panduan Kontribusi
+### CSS Architecture
+- **Global Styles**: `css/styles.css` (900+ lines)
+- **CSS Variables**: Color scheme, shadows, spacing
+- **Responsive Design**: Mobile-first approach
+- **No Build Process**: Pure CSS, no preprocessors
 
-1. **Fork** repository ini
-2. **Buat branch** fitur: `git checkout -b feature/nama-fitur`
-3. **Commit** perubahan: `git commit -am 'feat: tambah fitur baru'`
-4. **Push** ke branch: `git push origin feature/nama-fitur`
-5. **Buat Pull Request**
-
-### Commit Message Format
-```
-feat: tambah fitur baru
-fix: perbaiki bug
-docs: update dokumentasi
-style: format kode
-refactor: refactor code
-test: tambah test
+### Color Scheme
+```css
+--primary-color: #2196F3      (Blue)
+--secondary-color: #FF9800    (Orange)
+--success-color: #4CAF50      (Green)
+--danger-color: #f44336       (Red)
+--warning-color: #ff9800      (Orange)
+--info-color: #2196F3         (Blue)
 ```
 
----
+### Components
+- Cards, badges, tables, forms, buttons
+- Modals, alerts, notifications
+- Grid system (responsive)
+- Stat cards, sidebar navigation
 
-## 📞 Support & Kontak
+## 🔐 Authentication Flow
 
-**Institusi**: SMK Negeri 1 Lemahabang  
-**Departemen**: Teknik Komputer dan Jaringan  
-**Email**: it@smk1lemahabang.sch.id  
+```javascript
+// Login
+1. User submits email/password
+2. api.login() sends to /auth/login
+3. Backend returns { access_token, user }
+4. Token stored in localStorage
+5. User object stored in localStorage
+6. Redirect to appropriate dashboard
 
----
+// Logout
+1. api.logout() clears token
+2. localStorage cleared
+3. Redirect to login page
 
-## 📄 Lisensi
+// Protected Routes
+- requireLogin() checks isLoggedIn()
+- If not logged in, redirect to index.html
+- If logged in but wrong role, show error
+```
 
-Proprietary - SMK Negeri 1 Lemahabang
+## 📱 Responsive Design
 
----
+```css
+/* Mobile First */
+- Base styles untuk mobile (< 768px)
+- Tablet styles (768px - 1024px)
+- Desktop styles (> 1024px)
 
-## 🎯 Roadmap
+Key Breakpoints:
+@media (max-width: 768px)
+  - Single column grid
+  - Stack navigation
+  - Smaller fonts & padding
+```
 
-### Phase 1 (Current)
-- ✅ Setup backend dengan FastAPI
-- ✅ Database schema design
-- ✅ Authentication & Authorization
-- ⏳ API endpoints implementation
+## 🚀 Deployment
 
-### Phase 2
-- ⏳ Frontend development (HTML/CSS/JavaScript)
-- ⏳ Dashboard UI
-- ⏳ Integration testing
+### GitHub Pages
+1. Push frontend files ke repository root atau `/docs`
+2. Enable GitHub Pages di settings
+3. Access via `https://username.github.io`
 
-### Phase 3
-- ⏳ Production deployment
-- ⏳ Performance optimization
-- ⏳ Advanced features (export, reporting, analytics)
+### Custom Domain
+1. Add CNAME file dengan domain
+2. Configure DNS to point ke GitHub Pages
+3. Enable HTTPS di repository settings
 
----
+### CORS Configuration
+Backend harus enable CORS untuk frontend origin:
+```python
+# FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-## 📈 Status Pengembangan
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080", "https://username.github.io"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
 
-| Fitur | Status | Progress |
-|-------|--------|----------|
-| User Management | ✅ Complete | 100% |
-| Journal Mengajar | ✅ Complete | 100% |
-| Absensi Siswa | ✅ Complete | 100% |
-| Kurikulum (KI/KD) | ✅ Complete | 100% |
-| Kurikulum (ATP) | ✅ Complete | 100% |
-| Deep Learning | ✅ Complete | 100% |
-| Dashboard Admin | ⏳ In Progress | 50% |
-| Dashboard Guru | ⏳ In Progress | 50% |
-| Dashboard Siswa | ⏳ In Progress | 50% |
-| Frontend UI | ⏳ Planned | 0% |
-| Mobile App | ⏳ Planned | 0% |
+## 🔍 Browser Support
 
----
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+- Mobile browsers (iOS Safari, Chrome Mobile)
 
-## ✅ Checklist Setup
+## 📝 Error Handling
 
-- [ ] Clone repository
-- [ ] Setup Python virtual environment
-- [ ] Install dependencies
-- [ ] Konfigurasi .env
-- [ ] Inisialisasi database
-- [ ] Jalankan server
-- [ ] Akses http://localhost:8000/docs
-- [ ] Test login dengan seed data
-- [ ] Mulai development
+```javascript
+try {
+  const response = await api.login(email, password);
+  // Success handling
+} catch (error) {
+  showToast(error.message, 'danger');
+  // Error message displayed to user
+}
+```
 
----
+## 💾 Local Storage Usage
 
-**Last Updated**: 2026-01-26  
-**Version**: 1.0.0  
-**Status**: 🔄 Development Phase
+```javascript
+// Token
+localStorage.getItem('token')          // JWT token
+localStorage.setItem('token', token)
+
+// User Profile
+localStorage.getItem('user')           // User object JSON
+localStorage.setItem('user', JSON.stringify(user))
+
+// Notification Settings
+localStorage.getItem('notificationSettings')
+
+// Clear on logout
+localStorage.removeItem('token')
+localStorage.removeItem('user')
+```
+
+## 🔌 API Integration Checklist
+
+- [x] API client fully implemented (api.js)
+- [x] Authentication flow ready
+- [x] Error handling setup
+- [ ] Backend API endpoints (Next phase)
+- [ ] Database implementation (Next phase)
+- [ ] Testing suite (Future)
+
+## 🚨 Known Limitations & TODO
+
+### Current Implementation Status
+- ✅ Frontend UI complete (7 pages)
+- ✅ Responsive design implemented
+- ✅ API client ready
+- ✅ Utility functions complete
+- ⏳ Backend API endpoints (to be implemented)
+- ⏳ CRUD operations (dependent on backend)
+- ⏳ Real data loading (dependent on backend)
+- ⏳ File upload (for documents)
+- ⏳ Export functionality (Excel/PDF)
+- ⏳ Advanced filtering (dependent on backend)
+
+### Testing Recommendations
+1. Test with backend running on http://localhost:8000
+2. Verify CORS is configured
+3. Test authentication flow
+4. Verify role-based access
+5. Test responsive design on mobile
+
+## 📚 Documentation
+
+- [Backend Documentation](../PANDUAN_SETUP.md)
+- [API Documentation](../docs/API_DOCUMENTATION.md)
+- [Database Design](../docs/DATABASE_DESIGN.md)
+- [User Guide](../docs/USER_GUIDE.md)
+
+## 👨‍💻 Development Tips
+
+### Adding New Pages
+1. Create `pagename.html` in frontend/
+2. Import `css/styles.css`, `js/api.js`, `js/utils.js`
+3. Add navigation links in navbar
+4. Implement authentication check with `requireLogin()`
+5. Use `api.*` methods for data
+6. Use `showToast()` for notifications
+
+### Adding API Methods
+1. Add method to `APIClient` class in `api.js`
+2. Follow existing naming convention
+3. Use `_get()`, `_post()`, `_put()`, `_delete()` helpers
+4. Include proper error handling
+5. Document method in README
+
+### Styling Best Practices
+1. Use CSS variables for colors
+2. Mobile-first approach
+3. Use grid/flex for layouts
+4. Follow component structure
+5. Maintain responsive design
+
+## 📞 Support
+
+For issues or questions:
+- Check browser console for errors
+- Verify backend API is running
+- Check network tab for API calls
+- Review error messages in showToast()
+
+## 📄 License
+
+Part of Jurnal Mengajar & Absensi Siswa project.
