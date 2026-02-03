@@ -59,7 +59,7 @@ function getColorByType(type) {
 
 // Check if user is logged in
 function isLoggedIn() {
-  return !!localStorage.getItem('access_token');
+  return !!(localStorage.getItem('token') || localStorage.getItem('access_token'));
 }
 
 // Get logged in user
@@ -71,7 +71,7 @@ function getLoggedInUser() {
 // Redirect to login if not logged in
 function requireLogin() {
   if (!isLoggedIn()) {
-    window.location.href = '/frontend/login.html';
+    window.location.href = 'index.html';
   }
 }
 
@@ -165,3 +165,30 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// Show demo banner when running in demo mode (GitHub Pages)
+try {
+  if (typeof api !== 'undefined' && api.demo) {
+    const banner = document.createElement('div');
+    banner.className = 'demo-banner';
+    banner.style.cssText = `
+      position: fixed;
+      top: 64px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, rgba(33,150,243,0.95), rgba(255,152,0,0.95));
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 9998;
+      font-weight: 600;
+    `;
+    banner.textContent = 'Demo mode — Backend disabled. Data stored locally in your browser.';
+    document.body.appendChild(banner);
+
+    setTimeout(() => banner.remove(), 8000);
+  }
+} catch (e) {
+  // ignore if api is not defined yet
+}

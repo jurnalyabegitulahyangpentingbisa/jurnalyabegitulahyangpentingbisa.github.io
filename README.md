@@ -199,6 +199,38 @@ python scripts/init_database.py
 python scripts/seed_data.py
 ```
 
+## 📤 Deploy Frontend ke GitHub Pages
+
+Jika GitHub Pages saat ini hanya menampilkan `README.md`, jalankan salah satu opsi berikut untuk men-deploy UI full app yang ada di folder `frontend/`:
+
+Opsi A — Deploy ke branch `gh-pages` (direkomendasikan)
+
+1. Beri izin dan jalankan helper deploy dari root repo:
+
+```bash
+chmod +x deploy_frontend.sh
+./deploy_frontend.sh
+```
+
+2. Buka GitHub → Settings → Pages, pilih `gh-pages` branch dan `root` sebagai source. Setelah beberapa menit, situs akan tersedia di `https://<username>.github.io/<repo>/`.
+
+Opsi B — Serve dari folder `docs/` pada branch `main`
+
+1. Salin konten `frontend/` ke folder `docs/` dan push:
+
+```bash
+rm -rf docs && mkdir docs
+cp -r frontend/* docs/
+git add docs && git commit -m "Add frontend to docs for GitHub Pages" && git push origin main
+```
+
+2. Di GitHub → Settings → Pages, pilih `main` branch dan `/docs` folder.
+
+Catatan:
+- Frontend memiliki "demo mode" yang aktif saat dijalankan dari GitHub Pages — aplikasi akan menyimpan data di browser localStorage sehingga bekerja tanpa backend.
+- Untuk menghubungkan ke backend production, sesuaikan `frontend/js/api.js` dengan `api.setBaseURL('https://your-backend/api')` dan non-aktifkan demo condition.
+
+
 ### 4. Jalankan Server
 
 ```bash
